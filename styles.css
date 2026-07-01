@@ -531,6 +531,7 @@ section {
     display: grid;
     grid-template-columns: 2fr 1fr;
     gap: 40px;
+    align-items: flex-start;
 }
 
 .about-banner {
