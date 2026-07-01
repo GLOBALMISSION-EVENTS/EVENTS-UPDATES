@@ -51,8 +51,8 @@
                     <li><a href="#home" class="nav-link active">Home</a></li>
                     <li><a href="#events" class="nav-link">Events</a></li>
                     <li><a href="#about" class="nav-link">About Us</a></li>
-                    <li><a href="#cms" class="nav-link">CMS Admin</a></li>
                     <li><a href="qrcode.html" class="nav-link">QR Code</a></li>
+                    <li id="adminNav" style="display:none;"><a href="#cms" class="nav-link">CMS Admin</a></li>
                 </ul>
                 <button class="mobile-menu-btn" id="mobileMenuBtn">
                     <span></span>
@@ -174,9 +174,12 @@
             </div>
         </section>
 
-        <section class="cms-section" id="cms">
+        <section class="cms-section" id="cms" style="display:none;">
             <div class="container">
-                <h2 class="section-title">Content Management System</h2>
+                <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:20px;">
+                    <h2 class="section-title">Content Management System</h2>
+                    <button id="logoutBtn" class="btn-secondary">Logout</button>
+                </div>
                 <p class="section-subtitle">Easily manage your events with drag-and-drop simplicity</p>
                 
                 <div class="cms-controls">
@@ -190,6 +193,19 @@
                 
                 <div class="cms-grid" id="cmsGrid">
                 </div>
+            </div>
+        </section>
+
+        <!-- Admin Login Section (visible by default) -->
+        <section class="about-section" id="adminLogin">
+            <div class="container" style="max-width:500px;text-align:center;">
+                <h2 class="section-title">Admin Login</h2>
+                <p style="color:var(--text-light);margin-bottom:20px;">This area is restricted to authorized administrators only.</p>
+                <form id="loginForm" style="display:flex;flex-direction:column;gap:15px;">
+                    <input type="password" id="adminPassword" placeholder="Enter Admin Password" style="padding:15px;border:2px solid var(--primary-color);border-radius:8px;font-size:16px;" required>
+                    <button type="submit" class="btn-primary" style="min-height:48px;">Login</button>
+                    <p id="loginError" style="color:#dc3545;display:none;">Incorrect password. Please try again.</p>
+                </form>
             </div>
         </section>
     </main>

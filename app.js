@@ -41,18 +41,80 @@ let sortable = null;
 let currentSlide = 0;
 let slideInterval;
 
+// Authentication configuration
+const ADMIN_PASSWORD_KEY = 'gmci_admin_logged_in';
+const ADMIN_PASSWORD = 'gmci2026'; // You should change this to your own secure password!
+
 document.addEventListener('DOMContentLoaded', function() {
     // Auto-update copyright year
     document.getElementById('copyright-year').textContent = new Date().getFullYear();
+    
+    // Check authentication status on load
+    checkAuthStatus();
     
     // Initialize carousel
     initCarousel();
     
     renderEvents();
-    renderCMS();
+    // Don't render CMS unless authenticated
     initSortable();
     initEventListeners();
+    initAuthListeners();
 });
+
+// Authentication functions
+function checkAuthStatus() {
+    const isLoggedIn = localStorage.getItem(ADMIN_PASSWORD_KEY) === 'true';
+    if (isLoggedIn) {
+        showCMS();
+    } else {
+        showLogin();
+    }
+}
+
+function showCMS() {
+    document.getElementById('adminLogin').style.display = 'none';
+    document.getElementById('cms').style.display = 'block';
+    document.getElementById('adminNav').style.display = 'block';
+    renderCMS();
+}
+
+function showLogin() {
+    document.getElementById('adminLogin').style.display = 'block';
+    document.getElementById('cms').style.display = 'none';
+    document.getElementById('adminNav').style.display = 'none';
+    document.getElementById('loginError').style.display = 'none';
+}
+
+function login(password) {
+    if (password === ADMIN_PASSWORD) {
+        localStorage.setItem(ADMIN_PASSWORD_KEY, 'true');
+        showCMS();
+        return true;
+    }
+    return false;
+}
+
+function logout() {
+    localStorage.removeItem(ADMIN_PASSWORD_KEY);
+    showLogin();
+}
+
+function initAuthListeners() {
+    // Login form submit
+    document.getElementById('loginForm').addEventListener('submit', function(e) {
+        e.preventDefault();
+        const password = document.getElementById('adminPassword').value;
+        if (login(password)) {
+            document.getElementById('adminPassword').value = '';
+        } else {
+            document.getElementById('loginError').style.display = 'block';
+        }
+    });
+
+    // Logout button
+    document.getElementById('logoutBtn').addEventListener('click', logout);
+}
 
 function initCarousel() {
     const slides = document.querySelectorAll('.carousel-slide');
