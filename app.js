@@ -293,19 +293,25 @@ function initEventListeners() {
     
     document.querySelectorAll('.nav-link').forEach(link => {
         link.addEventListener('click', function(e) {
-            e.preventDefault();
-            const targetId = this.getAttribute('href').substring(1);
-            const targetSection = document.getElementById(targetId);
-            if (targetSection) {
-                targetSection.scrollIntoView({ behavior: 'smooth' });
-                document.querySelectorAll('.nav-link').forEach(l => l.classList.remove('active'));
-                this.classList.add('active');
-                // Close mobile menu
-                const mobileMenuBtn = document.getElementById('mobileMenuBtn');
-                const navLinks = document.getElementById('navLinks');
-                mobileMenuBtn.classList.remove('active');
-                navLinks.classList.remove('active');
+            const href = this.getAttribute('href');
+            
+            // Check if it's an internal anchor link (starts with #)
+            if (href.startsWith('#')) {
+                e.preventDefault();
+                const targetId = href.substring(1);
+                const targetSection = document.getElementById(targetId);
+                if (targetSection) {
+                    targetSection.scrollIntoView({ behavior: 'smooth' });
+                    document.querySelectorAll('.nav-link').forEach(l => l.classList.remove('active'));
+                    this.classList.add('active');
+                }
             }
+            
+            // Close mobile menu regardless of link type
+            const mobileMenuBtn = document.getElementById('mobileMenuBtn');
+            const navLinks = document.getElementById('navLinks');
+            mobileMenuBtn.classList.remove('active');
+            navLinks.classList.remove('active');
         });
     });
     
