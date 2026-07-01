@@ -41,6 +41,9 @@ let sortable = null;
 let currentSlide = 0;
 let slideInterval;
 
+// Smooth scroll and touch optimizations
+document.documentElement.style.scrollBehavior = 'smooth';
+
 // Authentication configuration
 const ADMIN_PASSWORD_KEY = 'gmci_admin_logged_in';
 const ADMIN_PASSWORD = 'gmci2026'; // You should change this to your own secure password!

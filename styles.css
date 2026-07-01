@@ -692,6 +692,28 @@ section {
     display: grid;
     grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
     gap: 20px;
+    -webkit-overflow-scrolling: touch;
+    overflow-y: auto;
+}
+
+@media (max-width: 768px) {
+    .cms-grid {
+        grid-template-columns: 1fr;
+    }
+    
+    .cms-section {
+        padding: 60px 20px !important;
+    }
+    
+    .cms-controls {
+        flex-direction: column;
+        align-items: stretch;
+    }
+    
+    .cms-controls button {
+        width: 100%;
+        margin-bottom: 10px;
+    }
 }
 
 .cms-card {
