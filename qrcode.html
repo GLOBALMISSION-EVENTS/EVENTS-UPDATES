@@ -3,33 +3,96 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>QR Code Generator</title>
+    <title>GMCI QR Code Generator</title>
     <link rel="stylesheet" href="styles.css">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcode/1.5.3/qrcode.min.js"></script>
 </head>
 <body style="min-height:100vh; display:flex; flex-direction:column; align-items:center; justify-content:center; background:linear-gradient(135deg, #1e3a5f 0%, #0f2744 100%); color:white; padding:40px;">
-    <h1 style="font-family: 'Playfair Display', serif; margin-bottom:30px;">QR Code Generator</h1>
-    <div style="max-width:500px; width:100%; text-align:center;">
-        <input type="text" id="urlInput" placeholder="Enter your GitHub Pages URL" style="width:100%; padding:15px; border-radius:8px; border:none; margin-bottom:20px; font-size:16px;" value="https://globalmission-events.github.io/EVENTS-UPDATES">
-        <button onclick="generateQR()" class="btn-primary" style="margin-bottom:30px;">Generate QR Code</button>
-        <div id="qrcode" style="background:white; padding:20px; border-radius:16px; display:inline-block;"></div>
-        <p style="margin-top:20px; opacity:0.8;">Scan this QR code to visit the website!</p>
-        <a href="index.html" style="display:inline-block; margin-top:20px; color:#f97316; text-decoration:none; font-weight:600;">← Back to Home</a>
+    <h1 style="font-family: 'Playfair Display', serif; margin-bottom:30px;">GMCI QR Code Generator</h1>
+    <div style="max-width:600px; width:100%; text-align:center;">
+        <input type="text" id="urlInput" placeholder="Enter URL" style="width:100%; padding:15px; border-radius:8px; border:none; margin-bottom:20px; font-size:16px;" value="https://globalmission-events.github.io/EVENTS-UPDATES">
+        <button onclick="generateQR()" class="btn-primary" style="margin-bottom:30px;">Regenerate QR Code</button>
+        
+        <div style="display:flex; gap:15px; flex-wrap:wrap; justify-content:center; margin-bottom:20px;">
+            <button onclick="downloadSVG()" class="btn-success" style="min-height:48px; padding:12px 25px;">Download SVG (Vector)</button>
+            <button onclick="downloadPNG()" class="btn-info" style="min-height:48px; padding:12px 25px;">Download PNG (300 DPI)</button>
+        </div>
+
+        <div id="qrContainer" style="background:white; padding:30px; border-radius:16px; display:inline-block; margin-bottom:20px;">
+            <div id="qrcode"></div>
+        </div>
+
+        <p style="opacity:0.9; margin-bottom:10px;">
+            <strong>Features:</strong> High error correction (30%), optimized for print & digital
+        </p>
+        <p style="opacity:0.8; font-size:14px;">
+            Scan with any iOS/Android QR scanner to visit the website
+        </p>
+        
+        <a href="index.html" style="display:inline-block; margin-top:30px; color:#f97316; text-decoration:none; font-weight:600;">← Back to Home</a>
     </div>
     
     <script>
+        let currentUrl = 'https://globalmission-events.github.io/EVENTS-UPDATES';
+        let qrSvgData = '';
+        const QUIET_ZONE = 4;
+
         function generateQR() {
-            const url = document.getElementById('urlInput').value || 'https://example.com';
+            currentUrl = document.getElementById('urlInput').value || 'https://globalmission-events.github.io/EVENTS-UPDATES';
             const qrcodeDiv = document.getElementById('qrcode');
             qrcodeDiv.innerHTML = '';
+            
+            // Generate canvas-based QR for display
             new QRCode(qrcodeDiv, {
-                text: url,
-                width: 256,
-                height: 256,
+                text: currentUrl,
+                width: 300,
+                height: 300,
                 colorDark : "#1e3a5f",
                 colorLight : "#ffffff",
                 correctLevel : QRCode.CorrectLevel.H
             });
+
+            // Generate SVG string for download
+            QRCode.toString(currentUrl, {
+                type: 'svg',
+                color: { dark: '#1e3a5f', light: '#ffffff' },
+                errorCorrectionLevel: 'H',
+                margin: QUIET_ZONE
+            }, (err, svg) => {
+                if (!err) {
+                    qrSvgData = svg;
+                }
+            });
+        }
+        
+        function downloadSVG() {
+            const blob = new Blob([qrSvgData], { type: 'image/svg+xml' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = 'gmci-qrcode.svg';
+            a.click();
+            URL.revokeObjectURL(url);
+        }
+        
+        async function downloadPNG() {
+            const canvas = document.createElement('canvas');
+            const size = 2000; // 2000x2000 pixels for high-res
+            canvas.width = size;
+            canvas.height = size;
+            
+            await QRCode.toCanvas(canvas, currentUrl, {
+                width: size,
+                margin: QUIET_ZONE,
+                color: { dark: '#1e3a5f', light: '#ffffff' },
+                errorCorrectionLevel: 'H'
+            });
+            
+            const link = document.createElement('a');
+            link.download = 'gmci-qrcode.png';
+            link.href = canvas.toDataURL('image/png');
+            link.click();
         }
         
         // Auto-generate QR code on page load
