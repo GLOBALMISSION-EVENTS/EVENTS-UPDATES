@@ -175,8 +175,8 @@ body {
     position: relative;
     z-index: 10;
     padding: 20px 0;
-    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
-    background: rgba(15, 23, 42, 0.85);
+    border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+    background: #FFFDD0;
     backdrop-filter: blur(10px);
     -webkit-backdrop-filter: blur(10px);
 }
@@ -216,6 +216,7 @@ body {
 .brand-text {
     font-weight: 600;
     font-size: 14px;
+    color: var(--dark-bg);
 }
 
 .nav-links {
@@ -225,7 +226,7 @@ body {
 }
 
 .nav-link {
-    color: var(--white);
+    color: var(--primary-color);
     text-decoration: none;
     font-weight: 500;
     font-size: 15px;
@@ -252,7 +253,7 @@ body {
 .mobile-menu-btn span {
     width: 25px;
     height: 3px;
-    background: var(--white);
+    background: var(--dark-bg);
     border-radius: 3px;
     transition: all 0.3s ease;
 }
@@ -277,7 +278,7 @@ body {
         right: 0;
         height: 100vh;
         width: 70%;
-        background: var(--dark-bg);
+        background: #FFFDD0;
         flex-direction: column;
         justify-content: center;
         align-items: center;
