@@ -6,7 +6,7 @@ const initialEvents = [
         venue: "Y.M.C.A. Hall - Nyeri Town",
         description: "Join us for a morning of fellowship, prayer, and inspiration as we unite in fundraising for the Great August Harvest, 5th Annual Mega Conference & Medical Camp. Breakfast will be served. Come Hungry - Leave Inspired. Blessed are those who hunger and thirst for righteousness, for they shall be filled. Mat 5:6 (NIV)",
         type: "upcoming",
-        image: "images/breakfast-poster.jpg"
+        image: "images/breakfast-poster.png"
     },
     {
         id: 2,
@@ -15,7 +15,7 @@ const initialEvents = [
         venue: "Kiamariga Nursery Grounds",
         description: "Theme: Healing the Land - Amos 9:14 From Exile to Divine Restoration. All Are Welcome! Featuring: Rev. Anthony Waithaka (Director - GMCI), Archbishop Simon Githigi (Elim Pentecostal Kenya), Bishop Moses Mbugua (Redeemed Gospel Church Thika), Apostle Anthony Ngumo (Reigners Chapel), Rev. James Nyaga (Excellent Glory Center), Bishop Dr. Margaret Wangare (Anointed Christian Fellowship Banana).",
         type: "upcoming",
-        image: "images/conference-poster.jpg"
+        image: "images/about-us.png"
     },
     {
         id: 3,
