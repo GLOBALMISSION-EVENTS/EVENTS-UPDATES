@@ -4,11 +4,17 @@
   "description": "Global Mission For Christ International Events Platform",
   "scripts": {
     "build": "echo 'No build step required - static site'",
-    "deploy": "gh-pages -d ."
+    "deploy": "gh-pages -d .",
+    "optimize-images": "node optimize-images.js"
   },
-  "keywords": ["gmci", "events", "church"],
+  "keywords": [
+    "gmci",
+    "events",
+    "church"
+  ],
   "author": "Global Mission For Christ International",
   "devDependencies": {
-    "gh-pages": "^6.1.1"
+    "gh-pages": "^6.1.1",
+    "sharp": "^0.35.3"
   }
 }
