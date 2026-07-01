@@ -488,6 +488,20 @@ section {
     gap: 40px;
 }
 
+.about-banner {
+    width: 100%;
+    margin-bottom: 40px;
+    border-radius: 16px;
+    overflow: hidden;
+    box-shadow: var(--shadow-lg);
+}
+
+.about-img {
+    width: 100%;
+    height: auto;
+    display: block;
+}
+
 .about-vision-mission {
     display: grid;
     grid-template-columns: 1fr 1fr;
