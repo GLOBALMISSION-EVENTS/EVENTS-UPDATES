@@ -39,6 +39,9 @@ let currentTab = 'upcoming';
 let sortable = null;
 
 document.addEventListener('DOMContentLoaded', function() {
+    // Auto-update copyright year
+    document.getElementById('copyright-year').textContent = new Date().getFullYear();
+    
     renderEvents();
     renderCMS();
     initSortable();
