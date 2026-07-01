@@ -6,7 +6,7 @@ const initialEvents = [
         venue: "Y.M.C.A. Hall - Nyeri Town",
         description: "Join us for a morning of fellowship, prayer, and inspiration as we unite in fundraising for the Great August Harvest, 5th Annual Mega Conference & Medical Camp. Breakfast will be served. Come Hungry - Leave Inspired. Blessed are those who hunger and thirst for righteousness, for they shall be filled. Mat 5:6 (NIV)",
         type: "upcoming",
-        image: ""
+        image: "https://coresg-normal.trae.ai/api/ide/v1/text_to_image?prompt=church%20breakfast%20fellowship%20with%20warm%20lighting%20and%20people%20praying%20together&image_size=landscape_16_9"
     },
     {
         id: 2,
@@ -15,7 +15,7 @@ const initialEvents = [
         venue: "Kiamariga Nursery Grounds",
         description: "Theme: Healing the Land - Amos 9:14 From Exile to Divine Restoration. All Are Welcome! Featuring: Rev. Anthony Waithaka (Director - GMCI), Archbishop Simon Githigi (Elim Pentecostal Kenya), Bishop Moses Mbugua (Redeemed Gospel Church Thika), Apostle Anthony Ngumo (Reigners Chapel), Rev. James Nyaga (Excellent Glory Center), Bishop Dr. Margaret Wangare (Anointed Christian Fellowship Banana).",
         type: "upcoming",
-        image: ""
+        image: "https://coresg-normal.trae.ai/api/ide/v1/text_to_image?prompt=large%20outdoor%20church%20conference%20with%20medical%20camp%20and%20worship%20stage&image_size=landscape_16_9"
     },
     {
         id: 3,
@@ -24,11 +24,17 @@ const initialEvents = [
         venue: "Kiamariga",
         description: "Our 5th Annual Conference & Medical Camp",
         type: "upcoming",
-        image: ""
+        image: "https://coresg-normal.trae.ai/api/ide/v1/text_to_image?prompt=medical%20camp%20with%20doctors%20treating%20patients%20and%20church%20gathering&image_size=landscape_16_9"
     }
 ];
 
-let events = JSON.parse(localStorage.getItem('gmci_events')) || initialEvents;
+// Load events: use initial events if localStorage is missing images
+const storedEvents = JSON.parse(localStorage.getItem('gmci_events'));
+let events = storedEvents;
+if (!events || !events[0] || !events[0].image) {
+    events = initialEvents;
+    saveToStorage();
+}
 let currentTab = 'upcoming';
 let sortable = null;
 
