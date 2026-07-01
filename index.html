@@ -13,7 +13,21 @@
 </head>
 <body>
     <header class="hero">
-        <div class="hero-overlay"></div>
+        <div class="hero-carousel">
+            <div class="carousel-slide active">
+                <img src="images/breakfast-poster.png" alt="Mission Impact Breakfast" class="carousel-image">
+                <div class="carousel-overlay"></div>
+            </div>
+            <div class="carousel-slide">
+                <img src="images/about-us.png" alt="GMCI Ministry" class="carousel-image">
+                <div class="carousel-overlay"></div>
+            </div>
+            <div class="carousel-slide">
+                <img src="images/kiamariga-camp.jpg" alt="Kiamariga Conference" class="carousel-image">
+                <div class="carousel-overlay"></div>
+            </div>
+        </div>
+        
         <nav class="navbar">
             <div class="container">
                 <div class="nav-brand">
@@ -34,11 +48,23 @@
                 </button>
             </div>
         </nav>
+        
         <div class="hero-content">
             <h1 class="hero-title">REVIVE THE NATIONS</h1>
             <h2 class="hero-subtitle">Preach the Gospel. Win Souls.</h2>
             <p class="hero-tagline">Christ for Every Nation</p>
             <a href="#events" class="btn-primary">View Upcoming Events</a>
+        </div>
+        
+        <div class="carousel-controls">
+            <button class="carousel-btn" id="prevBtn">&lt;</button>
+            <button class="carousel-btn" id="nextBtn">&gt;</button>
+        </div>
+        
+        <div class="carousel-dots" id="carouselDots">
+            <span class="dot active" data-index="0"></span>
+            <span class="dot" data-index="1"></span>
+            <span class="dot" data-index="2"></span>
         </div>
     </header>
 

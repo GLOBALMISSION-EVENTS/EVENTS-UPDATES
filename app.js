@@ -38,15 +38,84 @@ if (!events || !events[0] || !events[0].image) {
 let currentTab = 'upcoming';
 let sortable = null;
 
+let currentSlide = 0;
+let slideInterval;
+
 document.addEventListener('DOMContentLoaded', function() {
     // Auto-update copyright year
     document.getElementById('copyright-year').textContent = new Date().getFullYear();
+    
+    // Initialize carousel
+    initCarousel();
     
     renderEvents();
     renderCMS();
     initSortable();
     initEventListeners();
 });
+
+function initCarousel() {
+    const slides = document.querySelectorAll('.carousel-slide');
+    const dots = document.querySelectorAll('.dot');
+    const prevBtn = document.getElementById('prevBtn');
+    const nextBtn = document.getElementById('nextBtn');
+    
+    // Show first slide
+    showSlide(0);
+    
+    // Auto-play
+    startAutoPlay();
+    
+    // Navigation buttons
+    prevBtn.addEventListener('click', () => changeSlide(-1));
+    nextBtn.addEventListener('click', () => changeSlide(1));
+    
+    // Dot navigation
+    dots.forEach((dot, index) => {
+        dot.addEventListener('click', () => goToSlide(index));
+    });
+    
+    // Pause on hover
+    document.querySelector('.hero').addEventListener('mouseenter', stopAutoPlay);
+    document.querySelector('.hero').addEventListener('mouseleave', startAutoPlay);
+}
+
+function showSlide(index) {
+    const slides = document.querySelectorAll('.carousel-slide');
+    const dots = document.querySelectorAll('.dot');
+    
+    // Wrap around
+    if (index >= slides.length) currentSlide = 0;
+    if (index < 0) currentSlide = slides.length - 1;
+    
+    // Remove active from all
+    slides.forEach(slide => slide.classList.remove('active'));
+    dots.forEach(dot => dot.classList.remove('active'));
+    
+    // Add active to current
+    slides[currentSlide].classList.add('active');
+    dots[currentSlide].classList.add('active');
+}
+
+function changeSlide(direction) {
+    currentSlide += direction;
+    showSlide(currentSlide);
+}
+
+function goToSlide(index) {
+    currentSlide = index;
+    showSlide(currentSlide);
+}
+
+function startAutoPlay() {
+    slideInterval = setInterval(() => {
+        changeSlide(1);
+    }, 6000); // Change slide every 6 seconds
+}
+
+function stopAutoPlay() {
+    clearInterval(slideInterval);
+}
 
 function renderEvents() {
     const grid = document.getElementById('eventsGrid');
