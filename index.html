@@ -15,14 +15,17 @@
     <header class="hero">
         <div class="hero-carousel">
             <div class="carousel-slide active">
+                <div class="carousel-bg" style="background-image: url('images/breakfast-poster.png');"></div>
                 <img src="images/breakfast-poster.png" alt="Mission Impact Breakfast" class="carousel-image">
                 <div class="carousel-overlay"></div>
             </div>
             <div class="carousel-slide">
+                <div class="carousel-bg" style="background-image: url('images/about-us.png');"></div>
                 <img src="images/about-us.png" alt="GMCI Ministry" class="carousel-image">
                 <div class="carousel-overlay"></div>
             </div>
             <div class="carousel-slide">
+                <div class="carousel-bg" style="background-image: url('images/kiamariga-camp.jpg');"></div>
                 <img src="images/kiamariga-camp.jpg" alt="Kiamariga Conference" class="carousel-image">
                 <div class="carousel-overlay"></div>
             </div>
@@ -203,6 +206,11 @@
                 <div class="form-group">
                     <label for="eventImage">Image URL (optional)</label>
                     <input type="url" id="eventImage" placeholder="https://example.com/image.jpg">
+                </div>
+                <div class="form-group">
+                    <label for="eventImageFile">OR Upload from Computer</label>
+                    <input type="file" id="eventImageFile" accept="image/*">
+                    <div id="imagePreview" class="image-preview" style="margin-top:10px; max-height:150px; overflow:hidden;"></div>
                 </div>
                 <div class="form-actions">
                     <button type="submit" class="btn-primary">Save Event</button>

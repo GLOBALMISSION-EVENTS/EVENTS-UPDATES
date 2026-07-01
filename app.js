@@ -110,7 +110,7 @@ function goToSlide(index) {
 function startAutoPlay() {
     slideInterval = setInterval(() => {
         changeSlide(1);
-    }, 6000); // Change slide every 6 seconds
+    }, 12000); // Change slide every 12 seconds
 }
 
 function stopAutoPlay() {
@@ -211,6 +211,20 @@ function initEventListeners() {
     document.getElementById('modalClose').addEventListener('click', closeModal);
     document.getElementById('cancelBtn').addEventListener('click', closeModal);
     
+    // File upload listener
+    document.getElementById('eventImageFile').addEventListener('change', function(e) {
+        const file = e.target.files[0];
+        const imagePreview = document.getElementById('imagePreview');
+        if (file) {
+            const reader = new FileReader();
+            reader.onload = function(event) {
+                selectedImageData = event.target.result;
+                imagePreview.innerHTML = `<img src="${selectedImageData}" style="max-height:100px; border-radius:8px;">`;
+            };
+            reader.readAsDataURL(file);
+        }
+    });
+    
     document.getElementById('eventForm').addEventListener('submit', handleFormSubmit);
     
     document.querySelectorAll('.nav-link').forEach(link => {
@@ -233,12 +247,17 @@ function initEventListeners() {
     });
 }
 
+let selectedImageData = null;
+
 function openModal(event = null) {
     const modal = document.getElementById('eventModal');
     const modalTitle = document.getElementById('modalTitle');
     const form = document.getElementById('eventForm');
+    const imagePreview = document.getElementById('imagePreview');
     
     form.reset();
+    imagePreview.innerHTML = '';
+    selectedImageData = null;
     
     if (event) {
         modalTitle.textContent = 'Edit Event';
@@ -249,6 +268,9 @@ function openModal(event = null) {
         document.getElementById('eventDescription').value = event.description;
         document.getElementById('eventType').value = event.type;
         document.getElementById('eventImage').value = event.image;
+        if (event.image) {
+            imagePreview.innerHTML = `<img src="${event.image}" style="max-height:100px; border-radius:8px;">`;
+        }
     } else {
         modalTitle.textContent = 'Add New Event';
         document.getElementById('eventId').value = '';
@@ -272,7 +294,7 @@ function handleFormSubmit(e) {
         venue: document.getElementById('eventVenue').value,
         description: document.getElementById('eventDescription').value,
         type: document.getElementById('eventType').value,
-        image: document.getElementById('eventImage').value
+        image: selectedImageData || document.getElementById('eventImage').value
     };
     
     if (id) {
