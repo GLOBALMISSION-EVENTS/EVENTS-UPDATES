@@ -13,6 +13,6 @@ Examples of behavior that contributes to a positive environment include:
 
 ## Enforcement
 
-Instances of abusive, harassing, or otherwise unacceptable behavior may be reported to the community leaders responsible for enforcement at globalmissioncfc@gmail.com.
+Instances of abusive, harassing, or otherwise unacceptable behavior may be reported to the community leaders responsible for enforcement at globalmissionfci@gmail.com.
 
 This Code of Conduct is adapted from the [Contributor Covenant](https://www.contributor-covenant.org/).
