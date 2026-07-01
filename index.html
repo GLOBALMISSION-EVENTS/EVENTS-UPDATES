@@ -1,0 +1,182 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Global Mission For Christ International</title>
+    <link rel="stylesheet" href="styles.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&family=Playfair+Display:wght@700;800&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/sortablejs@1.15.0/Sortable.min.js"></script>
+</head>
+<body>
+    <header class="hero">
+        <div class="hero-overlay"></div>
+        <nav class="navbar">
+            <div class="container">
+                <div class="nav-brand">
+                    <div class="logo-circle">GMCI</div>
+                    <span class="brand-text">Global Mission For Christ International</span>
+                </div>
+                <ul class="nav-links" id="navLinks">
+                    <li><a href="#home" class="nav-link active">Home</a></li>
+                    <li><a href="#events" class="nav-link">Events</a></li>
+                    <li><a href="#about" class="nav-link">About Us</a></li>
+                    <li><a href="#cms" class="nav-link">CMS Admin</a></li>
+                </ul>
+                <button class="mobile-menu-btn" id="mobileMenuBtn">
+                    <span></span>
+                    <span></span>
+                    <span></span>
+                </button>
+            </div>
+        </nav>
+        <div class="hero-content">
+            <h1 class="hero-title">REVIVE THE NATIONS</h1>
+            <h2 class="hero-subtitle">Preach the Gospel. Win Souls.</h2>
+            <p class="hero-tagline">Christ for Every Nation</p>
+            <a href="#events" class="btn-primary">View Upcoming Events</a>
+        </div>
+    </header>
+
+    <main>
+        <section class="events-section" id="events">
+            <div class="container">
+                <h2 class="section-title">Events</h2>
+                <div class="events-tabs">
+                    <button class="tab-btn active" data-tab="upcoming">Upcoming</button>
+                    <button class="tab-btn" data-tab="recent">Recent</button>
+                </div>
+                <div class="events-grid" id="eventsGrid">
+                </div>
+            </div>
+        </section>
+
+        <section class="about-section" id="about">
+            <div class="container">
+                <div class="about-grid">
+                    <div class="about-text">
+                        <h2 class="section-title">About Us</h2>
+                        <div class="about-vision-mission">
+                            <div class="vision-card">
+                                <div class="card-icon">🎯</div>
+                                <h3>Vision</h3>
+                                <p>Propagate Revival to the nations of the world and draw men to Christ by the power of the Lord Jesus Christ.</p>
+                            </div>
+                            <div class="mission-card">
+                                <div class="card-icon">✝️</div>
+                                <h3>Mission</h3>
+                                <p>Global mission for Christ international is dedicated to igniting the fire of revival and to the teachings of the word of God. Raising men and women who will impact their generation through prayer, passion, and praise.</p>
+                            </div>
+                        </div>
+                        <div class="values-section">
+                            <h3>Our Values</h3>
+                            <ul class="values-list">
+                                <li>🙏 Prayers</li>
+                                <li>📖 Word of God</li>
+                                <li>🔥 Power of the Holy Spirit</li>
+                                <li>✨ Righteousness</li>
+                                <li>❤️ Passion</li>
+                            </ul>
+                        </div>
+                        <div class="director-section">
+                            <h3>Director's Message</h3>
+                            <p>At Global Mission for Christ International, our heartbeat is to see lives transformed by the power of Jesus Christ and revival spread to the nations of the world.</p>
+                            <p>We are committed to raising men and women grounded in prayer, rooted in the Word of God, empowered by the Holy Spirit, passionate for righteousness, and dedicated to impacting their generation for Christ.</p>
+                            <p>As a ministry, we continue to reach communities through the Gospel, prayer gatherings, revival meetings, and acts of compassion by supporting the needy through medical and community outreach programs.</p>
+                            <p><strong>May this ministry continue to inspire faith, ignite passion for God, and draw many into a deeper relationship with Christ. Together, let us shine His light and carry the message of hope to the world.</strong></p>
+                            <p class="director-sign">Rev. Dr. Anthony Waithaka<br><small>Director, Global Mission for Christ International</small></p>
+                        </div>
+                    </div>
+                    <div class="contact-card">
+                        <h3>Contact Us</h3>
+                        <div class="contact-item">
+                            <span class="contact-icon">📞</span>
+                            <div>
+                                <p>+254 715 493 666</p>
+                                <p>+254 710 642 232</p>
+                            </div>
+                        </div>
+                        <div class="contact-item">
+                            <span class="contact-icon">✉️</span>
+                            <p>globalmissioncfc@gmail.com</p>
+                        </div>
+                        <div class="contact-item">
+                            <span class="contact-icon">📍</span>
+                            <p>P.O. BOX 444 - 10100<br>Kenya</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section class="cms-section" id="cms">
+            <div class="container">
+                <h2 class="section-title">Content Management System</h2>
+                <p class="section-subtitle">Easily manage your events with drag-and-drop simplicity</p>
+                
+                <div class="cms-controls">
+                    <button class="btn-success" id="addEventBtn">+ Add New Event</button>
+                    <button class="btn-warning" id="saveDataBtn">💾 Save Changes</button>
+                    <button class="btn-info" id="exportDataBtn">📤 Export Data</button>
+                    <button class="btn-secondary" id="importDataBtn">📥 Import Data</button>
+                    <input type="file" id="importFile" accept=".json" style="display: none;">
+                </div>
+                
+                <div class="cms-grid" id="cmsGrid">
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <footer class="footer">
+        <div class="container">
+            <p>&copy; 2026 Global Mission For Christ International. All Rights Reserved.</p>
+        </div>
+    </footer>
+
+    <div class="modal" id="eventModal">
+        <div class="modal-content">
+            <span class="modal-close" id="modalClose">&times;</span>
+            <h2 id="modalTitle">Add New Event</h2>
+            <form id="eventForm">
+                <input type="hidden" id="eventId">
+                <div class="form-group">
+                    <label for="eventTitle">Event Title</label>
+                    <input type="text" id="eventTitle" required>
+                </div>
+                <div class="form-group">
+                    <label for="eventDate">Date</label>
+                    <input type="text" id="eventDate" placeholder="e.g., 10th July 2026 - 9AM" required>
+                </div>
+                <div class="form-group">
+                    <label for="eventVenue">Venue</label>
+                    <input type="text" id="eventVenue" placeholder="e.g., Y.M.C.A. Hall - Nyeri Town" required>
+                </div>
+                <div class="form-group">
+                    <label for="eventDescription">Description</label>
+                    <textarea id="eventDescription" rows="4" required></textarea>
+                </div>
+                <div class="form-group">
+                    <label for="eventType">Event Type</label>
+                    <select id="eventType">
+                        <option value="upcoming">Upcoming</option>
+                        <option value="recent">Recent</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="eventImage">Image URL (optional)</label>
+                    <input type="url" id="eventImage" placeholder="https://example.com/image.jpg">
+                </div>
+                <div class="form-actions">
+                    <button type="submit" class="btn-primary">Save Event</button>
+                    <button type="button" class="btn-secondary" id="cancelBtn">Cancel</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script src="app.js"></script>
+</body>
+</html>

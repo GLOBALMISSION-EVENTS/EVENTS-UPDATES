@@ -1,0 +1,14 @@
+{
+  "name": "gmci-events-platform",
+  "version": "1.0.0",
+  "description": "Global Mission For Christ International Events Platform",
+  "scripts": {
+    "build": "echo 'No build step required - static site'",
+    "deploy": "gh-pages -d ."
+  },
+  "keywords": ["gmci", "events", "church"],
+  "author": "Global Mission For Christ International",
+  "devDependencies": {
+    "gh-pages": "^6.1.1"
+  }
+}
