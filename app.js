@@ -124,6 +124,16 @@ function initEventListeners() {
         document.getElementById('importFile').click();
     });
     
+    document.getElementById('resetEventsBtn').addEventListener('click', () => {
+        if (confirm('Are you sure you want to reset all events to default?')) {
+            events = initialEvents;
+            saveToStorage();
+            renderEvents();
+            renderCMS();
+            alert('Events reset to default successfully!');
+        }
+    });
+    
     document.getElementById('importFile').addEventListener('change', importData);
     
     document.getElementById('modalClose').addEventListener('click', closeModal);
