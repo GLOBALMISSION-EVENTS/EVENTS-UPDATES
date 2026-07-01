@@ -10,7 +10,7 @@
 <body style="min-height:100vh; display:flex; flex-direction:column; align-items:center; justify-content:center; background:linear-gradient(135deg, #1e3a5f 0%, #0f2744 100%); color:white; padding:40px;">
     <h1 style="font-family: 'Playfair Display', serif; margin-bottom:30px;">QR Code Generator</h1>
     <div style="max-width:500px; width:100%; text-align:center;">
-        <input type="text" id="urlInput" placeholder="Enter your GitHub Pages URL" style="width:100%; padding:15px; border-radius:8px; border:none; margin-bottom:20px; font-size:16px;">
+        <input type="text" id="urlInput" placeholder="Enter your GitHub Pages URL" style="width:100%; padding:15px; border-radius:8px; border:none; margin-bottom:20px; font-size:16px;" value="https://globalmission-events.github.io/EVENTS-UPDATES">
         <button onclick="generateQR()" class="btn-primary" style="margin-bottom:30px;">Generate QR Code</button>
         <div id="qrcode" style="background:white; padding:20px; border-radius:16px; display:inline-block;"></div>
         <p style="margin-top:20px; opacity:0.8;">Scan this QR code to visit the website!</p>
@@ -31,6 +31,11 @@
                 correctLevel : QRCode.CorrectLevel.H
             });
         }
+        
+        // Auto-generate QR code on page load
+        document.addEventListener('DOMContentLoaded', function() {
+            generateQR();
+        });
     </script>
 </body>
 </html>
