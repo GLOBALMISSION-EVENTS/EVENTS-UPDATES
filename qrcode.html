@@ -5,7 +5,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>GMCI QR Code Generator</title>
     <link rel="stylesheet" href="styles.css">
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/qrcode@1.5.6/build/qrcode.min.js"></script>
 </head>
 <body style="min-height:100vh; display:flex; flex-direction:column; align-items:center; justify-content:center; background:linear-gradient(135deg, #1e3a5f 0%, #0f2744 100%); color:white; padding:40px;">
@@ -20,7 +19,7 @@
         </div>
 
         <div id="qrContainer" style="background:white; padding:30px; border-radius:16px; display:inline-block; margin-bottom:20px;">
-            <div id="qrcode"></div>
+            <canvas id="qrcodeCanvas" width="300" height="300"></canvas>
         </div>
 
         <p style="opacity:0.9; margin-bottom:10px;">
@@ -35,22 +34,20 @@
     
     <script>
         let currentUrl = 'https://globalmission-events.github.io/EVENTS-UPDATES';
-        let qrSvgData = '';
         const QUIET_ZONE = 4;
 
-        function generateQR() {
+        async function generateQR() {
             currentUrl = document.getElementById('urlInput').value || 'https://globalmission-events.github.io/EVENTS-UPDATES';
-            const qrcodeDiv = document.getElementById('qrcode');
-            qrcodeDiv.innerHTML = '';
+            const canvas = document.getElementById('qrcodeCanvas');
             
-            // Generate canvas-based QR for display
-            new QRCode(qrcodeDiv, {
-                text: currentUrl,
+            await QRCode.toCanvas(canvas, currentUrl, {
                 width: 300,
-                height: 300,
-                colorDark : "#1e3a5f",
-                colorLight : "#ffffff",
-                correctLevel : QRCode.CorrectLevel.H
+                errorCorrectionLevel: 'H',
+                margin: QUIET_ZONE,
+                color: {
+                    dark: '#1e3a5f',
+                    light: '#ffffff'
+                }
             });
         }
         
@@ -65,8 +62,7 @@
                         light: '#ffffff'
                     }
                 });
-                qrSvgData = svg;
-                const blob = new Blob([qrSvgData], { type: 'image/svg+xml' });
+                const blob = new Blob([svg], { type: 'image/svg+xml' });
                 const url = URL.createObjectURL(blob);
                 const a = document.createElement('a');
                 a.href = url;
@@ -74,6 +70,7 @@
                 a.click();
                 URL.revokeObjectURL(url);
             } catch (err) {
+                console.error(err);
                 alert('Error generating SVG, try again.');
             }
         }
@@ -100,6 +97,7 @@
                 link.href = canvas.toDataURL('image/png');
                 link.click();
             } catch (err) {
+                console.error(err);
                 alert('Error generating PNG, try again.');
             }
         }
