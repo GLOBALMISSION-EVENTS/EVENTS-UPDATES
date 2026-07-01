@@ -506,16 +506,46 @@ section {
     box-shadow: var(--shadow);
 }
 
-.director-section h3 {
-    font-size: 22px;
-    color: var(--primary-color);
-    margin-bottom: 20px;
+.director-header {
+    display: flex;
+    align-items: center;
+    gap: 25px;
+    margin-bottom: 25px;
+    padding-bottom: 20px;
+    border-bottom: 3px solid var(--secondary-color);
 }
 
-.director-sign {
-    margin-top: 25px;
-    font-weight: 600;
+.director-photo {
+    width: 160px;
+    height: 160px;
+    border-radius: 50%;
+    object-fit: cover;
+    border: 5px solid var(--secondary-color);
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+    transition: transform 0.4s ease;
+}
+
+.director-photo:hover {
+    transform: scale(1.05);
+}
+
+.director-info h3 {
+    font-size: 24px;
+    color: var(--primary-color);
+    margin-bottom: 8px;
+}
+
+.director-title {
+    font-size: 20px;
+    font-weight: 700;
     color: var(--secondary-color);
+    margin-bottom: 4px;
+}
+
+.director-subtitle {
+    font-size: 14px;
+    color: var(--text-light);
+    font-style: italic;
 }
 
 .contact-card {
