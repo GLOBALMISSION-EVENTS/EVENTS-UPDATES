@@ -123,8 +123,10 @@ function renderEvents() {
     
     grid.innerHTML = filteredEvents.map(event => `
         <div class="event-card">
-            <div class="event-card-image" style="${event.image ? `background: url('${event.image}') center/cover;` : ''}">
-                ${!event.image ? '✝️' : ''}
+            <div class="event-card-image">
+                ${event.image 
+                    ? `<img src="${event.image}" alt="${event.title}" class="event-card-img">` 
+                    : '✝️'}
             </div>
             <div class="event-card-content">
                 <h3 class="event-card-title">${event.title}</h3>
