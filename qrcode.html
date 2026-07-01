@@ -6,7 +6,7 @@
     <title>GMCI QR Code Generator</title>
     <link rel="stylesheet" href="styles.css">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcode/1.5.3/qrcode.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/qrcode@1.5.6/build/qrcode.min.js"></script>
 </head>
 <body style="min-height:100vh; display:flex; flex-direction:column; align-items:center; justify-content:center; background:linear-gradient(135deg, #1e3a5f 0%, #0f2744 100%); color:white; padding:40px;">
     <h1 style="font-family: 'Playfair Display', serif; margin-bottom:30px;">GMCI QR Code Generator</h1>
@@ -52,47 +52,56 @@
                 colorLight : "#ffffff",
                 correctLevel : QRCode.CorrectLevel.H
             });
-
-            // Generate SVG string for download
-            QRCode.toString(currentUrl, {
-                type: 'svg',
-                color: { dark: '#1e3a5f', light: '#ffffff' },
-                errorCorrectionLevel: 'H',
-                margin: QUIET_ZONE
-            }, (err, svg) => {
-                if (!err) {
-                    qrSvgData = svg;
-                }
-            });
         }
         
-        function downloadSVG() {
-            const blob = new Blob([qrSvgData], { type: 'image/svg+xml' });
-            const url = URL.createObjectURL(blob);
-            const a = document.createElement('a');
-            a.href = url;
-            a.download = 'gmci-qrcode.svg';
-            a.click();
-            URL.revokeObjectURL(url);
+        async function downloadSVG() {
+            try {
+                const svg = await QRCode.toString(currentUrl, {
+                    type: 'svg',
+                    errorCorrectionLevel: 'H',
+                    margin: QUIET_ZONE,
+                    color: {
+                        dark: '#1e3a5f',
+                        light: '#ffffff'
+                    }
+                });
+                qrSvgData = svg;
+                const blob = new Blob([qrSvgData], { type: 'image/svg+xml' });
+                const url = URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = 'gmci-qrcode.svg';
+                a.click();
+                URL.revokeObjectURL(url);
+            } catch (err) {
+                alert('Error generating SVG, try again.');
+            }
         }
         
         async function downloadPNG() {
-            const canvas = document.createElement('canvas');
-            const size = 2000; // 2000x2000 pixels for high-res
-            canvas.width = size;
-            canvas.height = size;
-            
-            await QRCode.toCanvas(canvas, currentUrl, {
-                width: size,
-                margin: QUIET_ZONE,
-                color: { dark: '#1e3a5f', light: '#ffffff' },
-                errorCorrectionLevel: 'H'
-            });
-            
-            const link = document.createElement('a');
-            link.download = 'gmci-qrcode.png';
-            link.href = canvas.toDataURL('image/png');
-            link.click();
+            try {
+                const canvas = document.createElement('canvas');
+                const size = 2000; // 2000x2000 pixels for high-res
+                canvas.width = size;
+                canvas.height = size;
+                
+                await QRCode.toCanvas(canvas, currentUrl, {
+                    width: size,
+                    errorCorrectionLevel: 'H',
+                    margin: QUIET_ZONE,
+                    color: {
+                        dark: '#1e3a5f',
+                        light: '#ffffff'
+                    }
+                });
+                
+                const link = document.createElement('a');
+                link.download = 'gmci-qrcode.png';
+                link.href = canvas.toDataURL('image/png');
+                link.click();
+            } catch (err) {
+                alert('Error generating PNG, try again.');
+            }
         }
         
         // Auto-generate QR code on page load
