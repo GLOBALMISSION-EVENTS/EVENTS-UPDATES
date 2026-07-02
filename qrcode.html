@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>GMCI QR Code Generator</title>
     <link rel="stylesheet" href="styles.css">
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcode/1.5.6/qrcode.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
     <style>
         body {
             min-height: 100vh;
@@ -35,6 +35,7 @@
             border: none;
             margin-bottom: 20px;
             font-size: 16px;
+            color: #1e3a5f;
         }
         .btn {
             display: inline-block;
@@ -74,6 +75,8 @@
             border-radius: 16px;
             display: inline-block;
             margin-bottom: 20px;
+            min-height: 300px;
+            min-width: 300px;
         }
         .back-link {
             color: #f97316;
@@ -92,102 +95,51 @@
         <button onclick="generateQR()" class="btn">Generate QR Code</button>
         
         <div style="display: flex; flex-wrap: wrap; justify-content: center; gap: 10px; margin: 20px 0;">
-            <button onclick="downloadSVG()" class="btn btn-success" id="svgBtn" disabled>Download SVG (Vector)</button>
-            <button onclick="downloadPNG()" class="btn btn-info" id="pngBtn" disabled>Download PNG (300 DPI)</button>
+            <button onclick="downloadPNG()" class="btn btn-success" id="pngBtn" disabled>Download PNG (Print Ready)</button>
         </div>
         
-        <div id="qrContainer">
-            <canvas id="qrcodeCanvas" width="300" height="300"></canvas>
-        </div>
+        <div id="qrContainer"></div>
         
         <p style="opacity: 0.8; margin-bottom: 20px;">Scan this QR code to visit the website!</p>
         <a href="index.html" class="back-link">← Back to Home</a>
     </div>
     
     <script>
+        let qrcode;
         let currentUrl = 'https://globalmission-events.github.io/EVENTS-UPDATES';
         let qrReady = false;
-        const QUIET_ZONE = 4;
 
         function generateQR() {
+            const container = document.getElementById('qrContainer');
+            container.innerHTML = ''; // Clear previous
+            
             currentUrl = document.getElementById('urlInput').value || 'https://globalmission-events.github.io/EVENTS-UPDATES';
-            const canvas = document.getElementById('qrcodeCanvas');
             
-            QRCode.toCanvas(canvas, currentUrl, {
+            qrcode = new QRCode(container, {
+                text: currentUrl,
                 width: 300,
-                errorCorrectionLevel: 'H',
-                margin: QUIET_ZONE,
-                color: {
-                    dark: '#1e3a5f',
-                    light: '#ffffff'
-                }
-            }, function(err) {
-                if (err) {
-                    console.error(err);
-                    return;
-                }
-                
-                qrReady = true;
-                document.getElementById('svgBtn').disabled = false;
-                document.getElementById('pngBtn').disabled = false;
+                height: 300,
+                colorDark: '#1e3a5f',
+                colorLight: '#ffffff',
+                correctLevel: QRCode.CorrectLevel.H
             });
+            
+            qrReady = true;
+            document.getElementById('pngBtn').disabled = false;
         }
         
-        async function downloadSVG() {
+        function downloadPNG() {
             if (!qrReady) return;
             
-            try {
-                const svg = await QRCode.toString(currentUrl, {
-                    type: 'svg',
-                    errorCorrectionLevel: 'H',
-                    margin: QUIET_ZONE,
-                    color: {
-                        dark: '#1e3a5f',
-                        light: '#ffffff'
-                    }
-                });
-                
-                const blob = new Blob([svg], { type: 'image/svg+xml' });
-                const url = URL.createObjectURL(blob);
-                const a = document.createElement('a');
-                a.href = url;
-                a.download = 'gmci-qrcode.svg';
-                a.click();
-                URL.revokeObjectURL(url);
-            } catch (err) {
-                console.error(err);
+            const img = document.getElementById('qrContainer').querySelector('img');
+            if (img) {
+                const link = document.createElement('a');
+                link.download = 'gmci-qrcode.png';
+                link.href = img.src;
+                link.click();
             }
         }
         
-        async function downloadPNG() {
-            if (!qrReady) return;
-            
-            try {
-                const canvas = document.createElement('canvas');
-                const size = 2048;
-                canvas.width = size;
-                canvas.height = size;
-                
-                await QRCode.toCanvas(canvas, currentUrl, {
-                    width: size,
-                    errorCorrectionLevel: 'H',
-                    margin: QUIET_ZONE,
-                    color: {
-                        dark: '#1e3a5f',
-                        light: '#ffffff'
-                    }
-                });
-                
-                const a = document.createElement('a');
-                a.download = 'gmci-qrcode.png';
-                a.href = canvas.toDataURL('image/png');
-                a.click();
-            } catch (err) {
-                console.error(err);
-            }
-        }
-        
-        // Auto-generate QR code on page load
         window.addEventListener('load', function() {
             generateQR();
         });
