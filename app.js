@@ -43,6 +43,19 @@ document.addEventListener('DOMContentLoaded', async function() {
     // Auto-update copyright year
     document.getElementById('copyright-year').textContent = new Date().getFullYear();
     
+    // Wait for Supabase to be ready
+    let retries = 0;
+    while (!window.getSupabase() && retries < 20) {
+        await new Promise(resolve => setTimeout(resolve, 100));
+        retries++;
+    }
+    
+    if (!window.getSupabase()) {
+        console.error('Failed to initialize Supabase');
+        alert('Failed to connect to database. Please refresh the page.');
+        return;
+    }
+    
     // Initialize Supabase modules
     await window.supabaseAuth.init();
     window.supabaseEvents.init();
