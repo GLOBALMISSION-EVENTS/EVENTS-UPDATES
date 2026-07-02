@@ -79,6 +79,7 @@ function showCMS() {
     document.getElementById('adminLogin').style.display = 'none';
     document.getElementById('cms').style.display = 'block';
     document.getElementById('adminNav').style.display = 'block';
+    document.getElementById('qrNav').style.display = 'block';
     renderCMS();
 }
 
@@ -86,6 +87,7 @@ function showLogin() {
     document.getElementById('adminLogin').style.display = 'block';
     document.getElementById('cms').style.display = 'none';
     document.getElementById('adminNav').style.display = 'none';
+    document.getElementById('qrNav').style.display = 'none';
     document.getElementById('loginError').style.display = 'none';
 }
 

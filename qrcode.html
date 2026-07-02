@@ -6,6 +6,16 @@
     <title>GMCI QR Code Generator</title>
     <link rel="stylesheet" href="styles.css">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/qrious/4.0.2/qrious.min.js"></script>
+    <script>
+        // Check admin authentication before loading
+        const ADMIN_PASSWORD_KEY = 'gmciAdminAuth';
+        const isLoggedIn = localStorage.getItem(ADMIN_PASSWORD_KEY) === 'true';
+        
+        if (!isLoggedIn) {
+            // Redirect to home if not authenticated
+            window.location.href = 'index.html';
+        }
+    </script>
     <style>
         body {
             min-height: 100vh;
@@ -20,7 +30,7 @@
         }
         h1 {
             font-family: 'Playfair Display', serif;
-            margin-bottom: 30px;
+            margin-bottom: 0;
             font-size: 2.5rem;
         }
         .container {
@@ -68,6 +78,12 @@
         }
         .btn-info:hover {
             background: #2563eb;
+        }
+        .btn-secondary {
+            background: #6b7280;
+        }
+        .btn-secondary:hover {
+            background: #4b5563;
         }
         #qrContainer {
             background: white;
@@ -142,7 +158,10 @@
 </head>
 <body>
     <div class="container">
-        <h1>GMCI QR Code Generator</h1>
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+            <h1>GMCI QR Code Generator</h1>
+            <button onclick="logout()" class="btn btn-secondary" style="padding: 10px 30px; margin: 0;">Logout</button>
+        </div>
         
         <input type="text" id="urlInput" placeholder="Enter URL" value="https://globalmission-events.github.io/EVENTS-UPDATES">
         
@@ -169,10 +188,17 @@
         </div>
         
         <p style="opacity: 0.8; margin-bottom: 20px;">Scan this QR code to visit the website!</p>
-        <a href="index.html" class="back-link">← Back to Home</a>
+        <a href="index.html#cms" class="back-link">← Back to Admin Dashboard</a>
     </div>
     
     <script>
+        // Logout function
+        function logout() {
+            const ADMIN_PASSWORD_KEY = 'gmciAdminAuth';
+            localStorage.removeItem(ADMIN_PASSWORD_KEY);
+            window.location.href = 'index.html';
+        }
+        
         let qr;
         let currentUrl = 'https://globalmission-events.github.io/EVENTS-UPDATES';
         let qrReady = false;
