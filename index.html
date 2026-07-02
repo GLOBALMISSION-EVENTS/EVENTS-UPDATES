@@ -9,6 +9,13 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&family=Playfair+Display:wght@700;800&display=swap" rel="stylesheet">
+    
+    <!-- Supabase -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="supabase-config.js"></script>
+    <script src="supabase-auth.js"></script>
+    <script src="supabase-events.js"></script>
+    
     <script src="https://cdn.jsdelivr.net/npm/sortablejs@1.15.0/Sortable.min.js"></script>
 </head>
 <body>
@@ -202,9 +209,10 @@
                 <h2 class="section-title">Admin Login</h2>
                 <p style="color:var(--text-light);margin-bottom:20px;">This area is restricted to authorized administrators only.</p>
                 <form id="loginForm" style="display:flex;flex-direction:column;gap:15px;">
-                    <input type="password" id="adminPassword" placeholder="Enter Admin Password" style="padding:15px;border:2px solid var(--primary-color);border-radius:8px;font-size:16px;" required>
+                    <input type="email" id="adminEmail" placeholder="Email Address" style="padding:15px;border:2px solid var(--primary-color);border-radius:8px;font-size:16px;" required>
+                    <input type="password" id="adminPassword" placeholder="Password" style="padding:15px;border:2px solid var(--primary-color);border-radius:8px;font-size:16px;" required>
                     <button type="submit" class="btn-primary" style="min-height:48px;">Login</button>
-                    <p id="loginError" style="color:#dc3545;display:none;">Incorrect password. Please try again.</p>
+                    <p id="loginError" style="color:#dc3545;display:none;">Login failed. Please check your credentials.</p>
                 </form>
             </div>
         </section>
