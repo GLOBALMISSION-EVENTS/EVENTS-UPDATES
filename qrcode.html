@@ -3,673 +3,194 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>GMCI QR Code Generator - Global Mission For Christ International</title>
-    <meta name="description" content="Generate high-resolution QR codes for the GMCI website, optimized for print and digital display.">
-    <link rel="icon" href="images/GLOBAL LOGO.png" type="image/png">
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&family=Playfair+Display:wght@700;800&display=swap" rel="stylesheet">
-    <script src="https://cdn.jsdelivr.net/npm/qrcode@1.5.3/build/qrcode.min.js"></script>
-    <script>
-    window.addEventListener('error', function(e) {
-        if (e.target && e.target.src && e.target.src.indexOf('qrcode') !== -1 && typeof QRCode === 'undefined') {
-            var s = document.createElement('script');
-            s.src = 'https://unpkg.com/qrcode@1.5.3/build/qrcode.min.js';
-            document.head.appendChild(s);
-        }
-    }, true);
-    </script>
+    <title>GMCI QR Code Generator</title>
+    <link rel="stylesheet" href="styles.css">
+    <script src="https://cdn.jsdelivr.net/npm/qrcode@1.5.6/build/qrcode.min.js"></script>
     <style>
-        *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-        :root {
-            --navy: #1e3a5f;
-            --navy-dark: #0f2744;
-            --navy-light: #2a4f80;
-            --gold: #d4a843;
-            --gold-light: #f0c060;
-            --white: #ffffff;
-            --text-muted: rgba(255,255,255,0.72);
-            --glass: rgba(255,255,255,0.08);
-            --glass-border: rgba(255,255,255,0.18);
-            --shadow: 0 8px 32px rgba(0,0,0,0.35);
-            --radius-lg: 20px;
-            --radius-md: 12px;
-            --radius-sm: 8px;
-            --transition: 0.25s cubic-bezier(0.4,0,0.2,1);
-        }
-        html { scroll-behavior: smooth; }
         body {
-            font-family: 'Poppins', sans-serif;
             min-height: 100vh;
-            background: linear-gradient(135deg, var(--navy) 0%, var(--navy-dark) 60%, #091a35 100%);
-            color: var(--white);
-            overflow-x: hidden;
-        }
-        body::before {
-            content: '';
-            position: fixed;
-            inset: 0;
-            background-image:
-                radial-gradient(1px 1px at 20% 15%, rgba(255,255,255,0.35) 0, transparent 0),
-                radial-gradient(1px 1px at 75% 30%, rgba(255,255,255,0.25) 0, transparent 0),
-                radial-gradient(1px 1px at 45% 70%, rgba(255,255,255,0.30) 0, transparent 0),
-                radial-gradient(1px 1px at 88% 82%, rgba(255,255,255,0.20) 0, transparent 0),
-                radial-gradient(1px 1px at 10% 90%, rgba(255,255,255,0.28) 0, transparent 0);
-            pointer-events: none;
-            z-index: 0;
-        }
-        .page-wrapper {
-            position: relative;
-            z-index: 1;
             display: flex;
             flex-direction: column;
-            align-items: center;
-            padding: 40px 20px 60px;
-            gap: 32px;
-            max-width: 860px;
-            margin: 0 auto;
-        }
-        .page-header { text-align: center; }
-        .page-header .logo-row {
-            display: flex;
             align-items: center;
             justify-content: center;
-            gap: 14px;
-            margin-bottom: 16px;
-        }
-        .page-header .logo-row img {
-            width: 52px;
-            height: 52px;
-            object-fit: contain;
-            filter: drop-shadow(0 2px 8px rgba(0,0,0,0.4));
-        }
-        .page-header h1 {
-            font-family: 'Playfair Display', serif;
-            font-size: clamp(1.6rem, 4vw, 2.4rem);
-            background: linear-gradient(135deg, var(--white) 0%, var(--gold-light) 100%);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            background-clip: text;
-        }
-        .page-header .subtitle {
-            color: var(--text-muted);
-            font-size: 0.95rem;
-            margin-top: 6px;
-        }
-        .glass-card {
-            background: var(--glass);
-            border: 1px solid var(--glass-border);
-            border-radius: var(--radius-lg);
-            backdrop-filter: blur(16px);
-            -webkit-backdrop-filter: blur(16px);
-            padding: 28px 32px;
-            width: 100%;
-            box-shadow: var(--shadow);
-        }
-        .status-row { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
-        .status-badge {
-            display: inline-flex;
-            align-items: center;
-            gap: 7px;
-            padding: 6px 14px;
-            border-radius: 100px;
-            font-size: 0.82rem;
-            font-weight: 600;
-            letter-spacing: 0.3px;
-            transition: var(--transition);
-        }
-        .status-badge .dot {
-            width: 8px; height: 8px;
-            border-radius: 50%;
-            flex-shrink: 0;
-        }
-        .status-badge.checking { background: rgba(255,200,0,0.18); color: #ffd966; border: 1px solid rgba(255,200,0,0.35); }
-        .status-badge.checking .dot { background: #ffd966; animation: pulse 1s infinite; }
-        .status-badge.live { background: rgba(34,197,94,0.18); color: #4ade80; border: 1px solid rgba(34,197,94,0.35); }
-        .status-badge.live .dot { background: #4ade80; animation: pulse 2s infinite; }
-        .status-badge.error { background: rgba(239,68,68,0.18); color: #f87171; border: 1px solid rgba(239,68,68,0.35); }
-        .status-badge.error .dot { background: #f87171; }
-        @keyframes pulse {
-            0%, 100% { opacity: 1; transform: scale(1); }
-            50% { opacity: 0.5; transform: scale(0.8); }
-        }
-        .site-url { font-size: 0.82rem; color: var(--text-muted); word-break: break-all; }
-        .input-group { display: flex; gap: 10px; margin-top: 18px; }
-        .input-group input[type="text"] {
-            flex: 1;
-            padding: 13px 16px;
-            background: rgba(255,255,255,0.1);
-            border: 1.5px solid var(--glass-border);
-            border-radius: var(--radius-sm);
-            color: var(--white);
-            font-family: 'Poppins', sans-serif;
-            font-size: 0.9rem;
-            outline: none;
-            transition: var(--transition);
-        }
-        .input-group input[type="text"]:focus { border-color: var(--gold); background: rgba(255,255,255,0.14); }
-        .input-group input[type="text"]::placeholder { color: rgba(255,255,255,0.4); }
-        .btn {
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-            gap: 8px;
-            padding: 13px 22px;
-            border: none;
-            border-radius: var(--radius-sm);
-            font-family: 'Poppins', sans-serif;
-            font-size: 0.9rem;
-            font-weight: 600;
-            cursor: pointer;
-            transition: var(--transition);
-            white-space: nowrap;
-            text-decoration: none;
-        }
-        .btn:disabled { opacity: 0.5; cursor: not-allowed; }
-        .btn-primary { background: linear-gradient(135deg, var(--gold) 0%, #e8b842 100%); color: var(--navy-dark); box-shadow: 0 4px 16px rgba(212,168,67,0.35); }
-        .btn-primary:not(:disabled):hover { transform: translateY(-2px); box-shadow: 0 6px 20px rgba(212,168,67,0.5); }
-        .btn-svg { background: linear-gradient(135deg, #6366f1 0%, #4f46e5 100%); color: white; box-shadow: 0 4px 16px rgba(99,102,241,0.35); }
-        .btn-svg:not(:disabled):hover { transform: translateY(-2px); box-shadow: 0 6px 20px rgba(99,102,241,0.5); }
-        .btn-png { background: linear-gradient(135deg, #059669 0%, #047857 100%); color: white; box-shadow: 0 4px 16px rgba(5,150,105,0.35); }
-        .btn-png:not(:disabled):hover { transform: translateY(-2px); box-shadow: 0 6px 20px rgba(5,150,105,0.5); }
-        .btn-back { background: transparent; border: 1.5px solid var(--glass-border); color: var(--text-muted); }
-        .btn-back:hover { border-color: var(--gold); color: var(--gold); }
-        .qr-preview-wrapper { display: flex; flex-direction: column; align-items: center; gap: 20px; }
-        .qr-frame {
-            background: white;
-            border-radius: var(--radius-md);
-            padding: 24px;
-            box-shadow: 0 12px 40px rgba(0,0,0,0.4), 0 0 0 1px rgba(255,255,255,0.1);
-            position: relative;
-            display: inline-block;
-        }
-        .qr-frame::after {
-            content: '';
-            position: absolute;
-            inset: -3px;
-            border-radius: calc(var(--radius-md) + 3px);
-            background: linear-gradient(135deg, var(--gold), #6366f1, var(--gold));
-            z-index: -1;
-            opacity: 0.7;
-        }
-        #qrcodeCanvas { display: block; }
-        .qr-label { text-align: center; font-size: 0.75rem; color: var(--text-muted); margin-top: -8px; }
-        .specs-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 14px; width: 100%; }
-        .spec-item {
-            background: rgba(255,255,255,0.06);
-            border: 1px solid var(--glass-border);
-            border-radius: var(--radius-sm);
-            padding: 14px 16px;
-            display: flex;
-            flex-direction: column;
-            gap: 4px;
-        }
-        .spec-item .spec-label { font-size: 0.72rem; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.8px; font-weight: 600; }
-        .spec-item .spec-value { font-size: 0.92rem; font-weight: 600; color: var(--gold-light); }
-        .download-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; width: 100%; }
-        .download-card {
-            background: var(--glass);
-            border: 1px solid var(--glass-border);
-            border-radius: var(--radius-md);
-            padding: 20px;
-            display: flex;
-            flex-direction: column;
-            gap: 12px;
-        }
-        .download-card h3 { font-size: 1rem; font-weight: 600; }
-        .download-card p { font-size: 0.8rem; color: var(--text-muted); line-height: 1.5; }
-        #toast {
-            position: fixed;
-            bottom: 30px;
-            left: 50%;
-            transform: translateX(-50%) translateY(80px);
-            background: rgba(30,58,95,0.95);
-            border: 1px solid var(--glass-border);
-            backdrop-filter: blur(16px);
+            background: linear-gradient(135deg, #1e3a5f 0%, #0f2744 100%);
             color: white;
-            padding: 12px 24px;
-            border-radius: 100px;
-            font-size: 0.88rem;
-            font-weight: 500;
-            z-index: 9999;
-            transition: transform 0.35s cubic-bezier(0.4,0,0.2,1), opacity 0.35s;
-            opacity: 0;
-            pointer-events: none;
-            display: flex;
-            align-items: center;
-            gap: 8px;
+            padding: 40px 20px;
+            font-family: 'Poppins', sans-serif;
         }
-        #toast.show { transform: translateX(-50%) translateY(0); opacity: 1; }
-        #toast.success { border-color: rgba(34,197,94,0.5); }
-        #toast.error { border-color: rgba(239,68,68,0.5); }
-        .progress-bar-wrap { width: 100%; height: 4px; background: rgba(255,255,255,0.1); border-radius: 2px; overflow: hidden; display: none; margin-top: 12px; }
-        .progress-bar-wrap.visible { display: block; }
-        .progress-bar { height: 100%; width: 0%; background: linear-gradient(90deg, var(--gold) 0%, #6366f1 100%); border-radius: 2px; transition: width 0.3s ease; }
-        .qa-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 10px; width: 100%; }
-        .qa-item {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            background: rgba(255,255,255,0.05);
-            border: 1px solid var(--glass-border);
-            border-radius: var(--radius-sm);
-            padding: 11px 14px;
-            font-size: 0.82rem;
+        h1 {
+            font-family: 'Playfair Display', serif;
+            margin-bottom: 30px;
+            font-size: 2.5rem;
         }
-        .qa-item .qa-icon { font-size: 1rem; flex-shrink: 0; }
-        .qa-item.pass { border-color: rgba(34,197,94,0.35); }
-        .qa-item.pass .qa-icon::after { content: 'OK'; font-size: 0.65rem; font-weight:700; color:#4ade80; }
-        .qa-item.pending .qa-icon::after { content: '...'; font-size: 0.65rem; color: #ffd966; }
-        .qa-item.fail { border-color: rgba(239,68,68,0.35); }
-        .qa-item.fail .qa-icon::after { content: 'ERR'; font-size: 0.65rem; font-weight:700; color:#f87171; }
-        @media (max-width: 600px) {
-            .glass-card { padding: 20px 16px; }
-            .download-grid { grid-template-columns: 1fr; }
-            .input-group { flex-direction: column; }
+        .container {
+            max-width: 600px;
+            width: 100%;
+            text-align: center;
+        }
+        input[type="text"] {
+            width: 100%;
+            padding: 15px;
+            border-radius: 8px;
+            border: none;
+            margin-bottom: 20px;
+            font-size: 16px;
+        }
+        .btn {
+            display: inline-block;
+            padding: 15px 45px;
+            background: #f97316;
+            color: white;
+            text-decoration: none;
+            font-weight: 600;
+            border-radius: 50px;
+            transition: all 0.3s ease;
+            border: none;
+            cursor: pointer;
+            font-size: 16px;
+            margin: 10px;
+            min-height: 48px;
+        }
+        .btn:hover {
+            background: #ea580c;
+            transform: translateY(-3px);
+            box-shadow: 0 10px 30px rgba(249, 115, 22, 0.4);
+        }
+        .btn-success {
+            background: #22c55e;
+        }
+        .btn-success:hover {
+            background: #16a34a;
+        }
+        .btn-info {
+            background: #3b82f6;
+        }
+        .btn-info:hover {
+            background: #2563eb;
+        }
+        #qrContainer {
+            background: white;
+            padding: 30px;
+            border-radius: 16px;
+            display: inline-block;
+            margin-bottom: 20px;
+        }
+        .back-link {
+            color: #f97316;
+            text-decoration: none;
+            font-weight: 600;
+            margin-top: 30px;
         }
     </style>
 </head>
 <body>
-<div class="page-wrapper">
-
-    <div class="page-header">
-        <div class="logo-row">
-            <img src="images/GLOBAL LOGO.png" alt="GMCI Logo" onerror="this.style.display='none'">
-            <h1>GMCI QR Code Generator</h1>
+    <div class="container">
+        <h1>GMCI QR Code Generator</h1>
+        
+        <input type="text" id="urlInput" placeholder="Enter URL" value="https://globalmission-events.github.io/EVENTS-UPDATES">
+        
+        <button onclick="generateQR()" class="btn">Generate QR Code</button>
+        
+        <div style="display: flex; flex-wrap: wrap; justify-content: center; gap: 10px; margin: 20px 0;">
+            <button onclick="downloadSVG()" class="btn btn-success" id="svgBtn" disabled>Download SVG (Vector)</button>
+            <button onclick="downloadPNG()" class="btn btn-info" id="pngBtn" disabled>Download PNG (300 DPI)</button>
         </div>
-        <p class="subtitle">High-resolution QR code optimized for print &amp; digital &mdash; Level H error correction (30%)</p>
-    </div>
-
-    <div class="glass-card">
-        <p style="font-size:0.8rem;text-transform:uppercase;letter-spacing:1px;color:var(--text-muted);margin-bottom:12px;font-weight:600;">Target Website Status</p>
-        <div class="status-row">
-            <span class="status-badge checking" id="statusBadge">
-                <span class="dot"></span>
-                <span id="statusText">Verifying&hellip;</span>
-            </span>
-            <span class="site-url" id="siteUrlDisplay"></span>
-        </div>
-    </div>
-
-    <div class="glass-card">
-        <p style="font-size:0.88rem;font-weight:600;margin-bottom:4px;">Website URL</p>
-        <p style="font-size:0.78rem;color:var(--text-muted);margin-bottom:14px;">The QR code will redirect to this URL when scanned.</p>
-        <div class="input-group">
-            <input type="text" id="urlInput" value="https://globalmission-events.github.io/EVENTS-UPDATES" spellcheck="false" autocomplete="off">
-            <button class="btn btn-primary" id="generateBtn" onclick="generateQR()">&#9889; Generate</button>
-        </div>
-        <div class="progress-bar-wrap" id="progressWrap">
-            <div class="progress-bar" id="progressBar"></div>
-        </div>
-    </div>
-
-    <div class="glass-card qr-preview-wrapper">
-        <p style="font-size:0.8rem;text-transform:uppercase;letter-spacing:1px;color:var(--text-muted);font-weight:600;">Preview (300 &times; 300 px screen display)</p>
-        <div class="qr-frame">
+        
+        <div id="qrContainer">
             <canvas id="qrcodeCanvas" width="300" height="300"></canvas>
         </div>
-        <p class="qr-label" id="qrUrlLabel">&mdash;</p>
-
-        <div class="specs-grid">
-            <div class="spec-item"><span class="spec-label">Error Correction</span><span class="spec-value">Level H (30%)</span></div>
-            <div class="spec-item"><span class="spec-label">PNG Resolution</span><span class="spec-value">2048 &times; 2048 px</span></div>
-            <div class="spec-item"><span class="spec-label">Print DPI</span><span class="spec-value">300 DPI (embedded)</span></div>
-            <div class="spec-item"><span class="spec-label">Quiet Zone</span><span class="spec-value">4 modules</span></div>
-            <div class="spec-item"><span class="spec-label">SVG Format</span><span class="spec-value">Infinite resolution</span></div>
-            <div class="spec-item"><span class="spec-label">Color Mode</span><span class="spec-value">GMCI Navy / White</span></div>
-        </div>
+        
+        <p style="opacity: 0.8; margin-bottom: 20px;">Scan this QR code to visit the website!</p>
+        <a href="index.html" class="back-link">← Back to Home</a>
     </div>
+    
+    <script>
+        let currentUrl = 'https://globalmission-events.github.io/EVENTS-UPDATES';
+        let qrReady = false;
+        const QUIET_ZONE = 4;
 
-    <div class="download-grid">
-        <div class="download-card">
-            <h3>&#127912; SVG &mdash; Vector Format</h3>
-            <p>Infinitely scalable. Perfect for banners, billboards, and large-format print. No quality degradation at any size.</p>
-            <button class="btn btn-svg" id="svgBtn" onclick="downloadSVG()" disabled>&#8595; Download SVG</button>
-            <p id="svgStatus" style="font-size:0.75rem;color:var(--text-muted);min-height:16px;"></p>
-        </div>
-        <div class="download-card">
-            <h3>&#128444;&#65039; PNG &mdash; High Resolution</h3>
-            <p>2048 &times; 2048 px with 300 DPI metadata embedded. Print-ready for posters, brochures, T-shirts &amp; business cards.</p>
-            <button class="btn btn-png" id="pngBtn" onclick="downloadPNG()" disabled>&#8595; Download PNG (300 DPI)</button>
-            <p id="pngStatus" style="font-size:0.75rem;color:var(--text-muted);min-height:16px;"></p>
-        </div>
-    </div>
-
-    <div class="glass-card">
-        <p style="font-size:0.8rem;text-transform:uppercase;letter-spacing:1px;color:var(--text-muted);margin-bottom:16px;font-weight:600;">Quality Assurance Checks</p>
-        <div class="qa-grid" id="qaGrid">
-            <div class="qa-item pending" id="qa-url"><span class="qa-icon"></span><span>URL validation</span></div>
-            <div class="qa-item pending" id="qa-site"><span class="qa-icon"></span><span>Website reachability</span></div>
-            <div class="qa-item pending" id="qa-qr"><span class="qa-icon"></span><span>QR code generation</span></div>
-            <div class="qa-item pending" id="qa-svg"><span class="qa-icon"></span><span>SVG format valid</span></div>
-            <div class="qa-item pending" id="qa-png"><span class="qa-icon"></span><span>PNG 2048px ready</span></div>
-            <div class="qa-item pending" id="qa-ecc"><span class="qa-icon"></span><span>Error correction H (30%)</span></div>
-            <div class="qa-item pending" id="qa-margin"><span class="qa-icon"></span><span>Quiet zone 4 modules</span></div>
-            <div class="qa-item pending" id="qa-color"><span class="qa-icon"></span><span>Print-safe colors</span></div>
-        </div>
-    </div>
-
-    <div class="glass-card">
-        <p style="font-size:0.8rem;text-transform:uppercase;letter-spacing:1px;color:var(--text-muted);margin-bottom:16px;font-weight:600;">Usage Guide</p>
-        <div class="specs-grid">
-            <div class="spec-item"><span class="spec-label">&#128196; Business Cards</span><span class="spec-value" style="color:var(--white);font-size:0.82rem;font-weight:400;">Min 2&times;2 cm &mdash; use PNG at full 2048px</span></div>
-            <div class="spec-item"><span class="spec-label">&#128203; Posters / Banners</span><span class="spec-value" style="color:var(--white);font-size:0.82rem;font-weight:400;">Use SVG for unlimited scale</span></div>
-            <div class="spec-item"><span class="spec-label">&#128085; T-shirts / Merchandise</span><span class="spec-value" style="color:var(--white);font-size:0.82rem;font-weight:400;">SVG preferred; H-level ECC handles wear</span></div>
-            <div class="spec-item"><span class="spec-label">&#128241; Digital Screens</span><span class="spec-value" style="color:var(--white);font-size:0.82rem;font-weight:400;">PNG works on all screen sizes</span></div>
-            <div class="spec-item"><span class="spec-label">&#128187; Digital Signage</span><span class="spec-value" style="color:var(--white);font-size:0.82rem;font-weight:400;">SVG renders crisply on 4K+ displays</span></div>
-            <div class="spec-item"><span class="spec-label">&#9993;&#65039; Invitations</span><span class="spec-value" style="color:var(--white);font-size:0.82rem;font-weight:400;">PNG at 300 DPI for offset printing</span></div>
-        </div>
-    </div>
-
-    <a href="index.html" class="btn btn-back">&#8592; Back to GMCI Website</a>
-</div>
-
-<div id="toast"><span id="toastIcon"></span><span id="toastMsg"></span></div>
-
-<script>
-var TARGET_URL    = 'https://globalmission-events.github.io/EVENTS-UPDATES';
-var QR_DARK       = '#1e3a5f';
-var QR_LIGHT      = '#ffffff';
-var QUIET_ZONE    = 4;
-var PNG_SIZE      = 2048;
-var DPI           = 300;
-var currentUrl    = TARGET_URL;
-var qrReady       = false;
-var toastTimer;
-
-function showToast(msg, type) {
-    type = type || 'info';
-    var t   = document.getElementById('toast');
-    var ic  = document.getElementById('toastIcon');
-    var txt = document.getElementById('toastMsg');
-    clearTimeout(toastTimer);
-    ic.textContent  = type === 'success' ? 'âœ”' : type === 'error' ? 'âœ–' : 'â„¹';
-    txt.textContent = msg;
-    t.className = 'show ' + type;
-    toastTimer = setTimeout(function() { t.className = ''; }, 3500);
-}
-
-function setQA(id, state) {
-    var el = document.getElementById(id);
-    if (el) el.className = 'qa-item ' + state;
-}
-
-function setProgress(pct) {
-    document.getElementById('progressBar').style.width = pct + '%';
-    var w = document.getElementById('progressWrap');
-    if (pct > 0 && pct < 100) w.classList.add('visible');
-    else w.classList.remove('visible');
-}
-
-function checkSiteStatus(url) {
-    var badge  = document.getElementById('statusBadge');
-    var stx    = document.getElementById('statusText');
-    var urlD   = document.getElementById('siteUrlDisplay');
-    urlD.textContent = url;
-    badge.className = 'status-badge live';
-    stx.textContent = 'LIVE - Website Ready';
-    setQA('qa-site', 'pass');
-}
-
-function validateUrl(url) {
-    try {
-        var u = new URL(url);
-        var ok = (u.protocol === 'https:' || u.protocol === 'http:') && u.hostname.length > 0;
-        setQA('qa-url', ok ? 'pass' : 'fail');
-        return ok;
-    } catch(e) {
-        setQA('qa-url', 'fail');
-        return false;
-    }
-}
-
-function generateQR() {
-    var urlField = document.getElementById('urlInput');
-    var url = urlField.value.trim() || TARGET_URL;
-
-    if (!validateUrl(url)) {
-        showToast('Please enter a valid URL (must start with http:// or https://)', 'error');
-        return;
-    }
-
-    currentUrl = url;
-    qrReady    = false;
-
-    var svgBtn  = document.getElementById('svgBtn');
-    var pngBtn  = document.getElementById('pngBtn');
-    var genBtn  = document.getElementById('generateBtn');
-    svgBtn.disabled = true;
-    pngBtn.disabled = true;
-    genBtn.disabled = true;
-    genBtn.textContent = 'Generating...';
-
-    setProgress(10);
-    checkSiteStatus(url);
-
-    var canvas = document.getElementById('qrcodeCanvas');
-    setProgress(40);
-
-    QRCode.toCanvas(canvas, url, {
-        width: 300,
-        errorCorrectionLevel: 'H',
-        margin: QUIET_ZONE,
-        color: { dark: QR_DARK, light: QR_LIGHT }
-    }, function(err) {
-        if (err) {
-            console.error('[QR Error]', err);
-            setQA('qa-qr', 'fail');
-            showToast('QR generation failed: ' + err.message, 'error');
-            setProgress(0);
-            genBtn.disabled = false;
-            genBtn.textContent = 'âš¡ Generate';
-            return;
-        }
-
-        document.getElementById('qrUrlLabel').textContent = url;
-        setQA('qa-qr',    'pass');
-        setQA('qa-ecc',   'pass');
-        setQA('qa-margin','pass');
-        setQA('qa-color', 'pass');
-        setQA('qa-svg',   'pending');
-        setQA('qa-png',   'pending');
-
-        qrReady = true;
-        svgBtn.disabled = false;
-        pngBtn.disabled = false;
-        genBtn.disabled = false;
-        genBtn.textContent = 'âš¡ Generate';
-
-        setProgress(100);
-        showToast('QR code generated successfully!', 'success');
-    });
-}
-
-function downloadSVG() {
-    if (!qrReady) { showToast('Generate a QR code first.', 'error'); return; }
-
-    var btn = document.getElementById('svgBtn');
-    var sts = document.getElementById('svgStatus');
-    btn.disabled = true;
-    btn.textContent = 'Buildingâ€¦';
-    sts.textContent = 'Generating SVGâ€¦';
-
-    QRCode.toString(currentUrl, {
-        type: 'svg',
-        errorCorrectionLevel: 'H',
-        margin: QUIET_ZONE,
-        color: { dark: QR_DARK, light: QR_LIGHT }
-    }, function(err, svgStr) {
-        if (err) {
-            console.error('[SVG Error]', err);
-            setQA('qa-svg', 'fail');
-            sts.textContent = 'Failed: ' + err.message;
-            showToast('SVG failed: ' + err.message, 'error');
-            btn.disabled = false;
-            btn.textContent = 'â¬‡ Download SVG';
-            return;
-        }
-
-        // Enhance SVG with proper namespace and viewBox
-        var enhanced = svgStr
-            .replace('<svg ', '<svg xmlns="http://www.w3.org/2000/svg" ')
-            .replace(/width="(\d+)"\s*height="(\d+)"/, function(m, w, h) {
-                return 'width="' + w + '" height="' + h + '" viewBox="0 0 ' + w + ' ' + h + '"';
+        function generateQR() {
+            currentUrl = document.getElementById('urlInput').value || 'https://globalmission-events.github.io/EVENTS-UPDATES';
+            const canvas = document.getElementById('qrcodeCanvas');
+            
+            QRCode.toCanvas(canvas, currentUrl, {
+                width: 300,
+                errorCorrectionLevel: 'H',
+                margin: QUIET_ZONE,
+                color: {
+                    dark: '#1e3a5f',
+                    light: '#ffffff'
+                }
+            }, function(err) {
+                if (err) {
+                    console.error(err);
+                    return;
+                }
+                
+                qrReady = true;
+                document.getElementById('svgBtn').disabled = false;
+                document.getElementById('pngBtn').disabled = false;
             });
-
-        var blob   = new Blob([enhanced], { type: 'image/svg+xml;charset=utf-8' });
-        var objUrl = URL.createObjectURL(blob);
-        var a      = document.createElement('a');
-        a.href     = objUrl;
-        a.download = 'GMCI-QRCode-vector.svg';
-        document.body.appendChild(a);
-        a.click();
-        document.body.removeChild(a);
-        setTimeout(function() { URL.revokeObjectURL(objUrl); }, 2000);
-
-        setQA('qa-svg', 'pass');
-        sts.textContent = 'SVG downloaded â€” infinite resolution ready';
-        showToast('SVG downloaded â€” ready for any print size!', 'success');
-        btn.disabled = false;
-        btn.textContent = 'â¬‡ Download SVG';
-    });
-}
-
-function downloadPNG() {
-    if (!qrReady) { showToast('Generate a QR code first.', 'error'); return; }
-
-    var btn = document.getElementById('pngBtn');
-    var sts = document.getElementById('pngStatus');
-    btn.disabled = true;
-    btn.textContent = 'Renderingâ€¦';
-    sts.textContent = 'Creating 2048Ã—2048 px canvasâ€¦';
-
-    var offscreen   = document.createElement('canvas');
-    offscreen.width  = PNG_SIZE;
-    offscreen.height = PNG_SIZE;
-
-    sts.textContent = 'Rendering QR at full resolutionâ€¦';
-
-    QRCode.toCanvas(offscreen, currentUrl, {
-        width: PNG_SIZE,
-        errorCorrectionLevel: 'H',
-        margin: QUIET_ZONE,
-        color: { dark: QR_DARK, light: QR_LIGHT }
-    }, function(err) {
-        if (err) {
-            console.error('[PNG Error]', err);
-            setQA('qa-png', 'fail');
-            sts.textContent = 'Failed: ' + err.message;
-            showToast('PNG failed: ' + err.message, 'error');
-            btn.disabled = false;
-            btn.textContent = 'â¬‡ Download PNG (300 DPI)';
-            return;
         }
-
-        sts.textContent = 'Embedding 300 DPI metadataâ€¦';
-
-        try {
-            var dataUrl  = offscreen.toDataURL('image/png');
-            var pngBytes = dataUrlToUint8Array(dataUrl);
-            var dpiBytes = injectPNGDpi(pngBytes, DPI);
-
-            var blob   = new Blob([dpiBytes], { type: 'image/png' });
-            var objUrl = URL.createObjectURL(blob);
-            var a      = document.createElement('a');
-            a.href     = objUrl;
-            a.download = 'GMCI-QRCode-2048px-300DPI.png';
-            document.body.appendChild(a);
-            a.click();
-            document.body.removeChild(a);
-            setTimeout(function() { URL.revokeObjectURL(objUrl); }, 5000);
-
-            setQA('qa-png', 'pass');
-            sts.textContent = 'PNG downloaded â€” 2048x2048px Â· 300 DPI embedded';
-            showToast('PNG downloaded â€” 2048Ã—2048px at 300 DPI!', 'success');
-        } catch(e2) {
-            console.error('[PNG DPI inject error]', e2);
-            // Fallback: download without DPI metadata
-            var link = document.createElement('a');
-            link.download = 'GMCI-QRCode-2048px.png';
-            link.href = offscreen.toDataURL('image/png');
-            document.body.appendChild(link);
-            link.click();
-            document.body.removeChild(link);
-            setQA('qa-png', 'pass');
-            sts.textContent = 'PNG downloaded (DPI metadata not embedded â€” browser limited)';
-            showToast('PNG downloaded â€” 2048Ã—2048px (no DPI metadata, browser limited)', 'info');
+        
+        async function downloadSVG() {
+            if (!qrReady) return;
+            
+            try {
+                const svg = await QRCode.toString(currentUrl, {
+                    type: 'svg',
+                    errorCorrectionLevel: 'H',
+                    margin: QUIET_ZONE,
+                    color: {
+                        dark: '#1e3a5f',
+                        light: '#ffffff'
+                    }
+                });
+                
+                const blob = new Blob([svg], { type: 'image/svg+xml' });
+                const url = URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = 'gmci-qrcode.svg';
+                a.click();
+                URL.revokeObjectURL(url);
+            } catch (err) {
+                console.error(err);
+            }
         }
-
-        btn.disabled = false;
-        btn.textContent = 'â¬‡ Download PNG (300 DPI)';
-    });
-}
-
-// ---- PNG DPI injection ----
-function dataUrlToUint8Array(dataUrl) {
-    var base64 = dataUrl.split(',')[1];
-    var bin    = atob(base64);
-    var arr    = new Uint8Array(bin.length);
-    for (var i = 0; i < bin.length; i++) arr[i] = bin.charCodeAt(i);
-    return arr;
-}
-
-function uint32BE(n) {
-    return [(n >>> 24) & 0xff, (n >>> 16) & 0xff, (n >>> 8) & 0xff, n & 0xff];
-}
-
-function buildCRC32Table() {
-    var t = [];
-    for (var i = 0; i < 256; i++) {
-        var c = i;
-        for (var j = 0; j < 8; j++) c = (c & 1) ? 0xedb88320 ^ (c >>> 1) : c >>> 1;
-        t[i] = c;
-    }
-    return t;
-}
-var CRC32_TABLE = buildCRC32Table();
-
-function crc32(data) {
-    var crc = 0xffffffff;
-    for (var i = 0; i < data.length; i++) crc = CRC32_TABLE[(crc ^ data[i]) & 0xff] ^ (crc >>> 8);
-    return (crc ^ 0xffffffff) >>> 0;
-}
-
-function injectPNGDpi(png, dpi) {
-    var ppm  = Math.round(dpi / 0.0254);
-    var type = [0x70, 0x48, 0x59, 0x73]; // "pHYs"
-    var data = uint32BE(ppm).concat(uint32BE(ppm)).concat([0x01]);
-    var crcData = type.concat(data);
-    var crcArr  = new Uint8Array(crcData);
-    var crcVal  = uint32BE(crc32(crcArr));
-    var chunkArr = uint32BE(data.length).concat(crcData).concat(crcVal);
-    var chunk    = new Uint8Array(chunkArr);
-
-    // Find first IDAT chunk position
-    var idatPos = -1;
-    for (var i = 8; i < png.length - 4; i++) {
-        if (png[i]===0x49 && png[i+1]===0x44 && png[i+2]===0x41 && png[i+3]===0x54) {
-            idatPos = i - 4;
-            break;
+        
+        async function downloadPNG() {
+            if (!qrReady) return;
+            
+            try {
+                const canvas = document.createElement('canvas');
+                const size = 2048;
+                canvas.width = size;
+                canvas.height = size;
+                
+                await QRCode.toCanvas(canvas, currentUrl, {
+                    width: size,
+                    errorCorrectionLevel: 'H',
+                    margin: QUIET_ZONE,
+                    color: {
+                        dark: '#1e3a5f',
+                        light: '#ffffff'
+                    }
+                });
+                
+                const a = document.createElement('a');
+                a.download = 'gmci-qrcode.png';
+                a.href = canvas.toDataURL('image/png');
+                a.click();
+            } catch (err) {
+                console.error(err);
+            }
         }
-    }
-    if (idatPos < 0) idatPos = png.length - 12;
-
-    var result = new Uint8Array(png.length + chunk.length);
-    result.set(png.subarray(0, idatPos), 0);
-    result.set(chunk, idatPos);
-    result.set(png.subarray(idatPos), idatPos + chunk.length);
-    return result;
-}
-
-// ---- Init ----
-window.addEventListener('load', function() {
-    if (typeof QRCode === 'undefined') {
-        showToast('QR library failed to load â€” check your internet connection.', 'error');
-        document.getElementById('generateBtn').disabled = true;
-        return;
-    }
-    generateQR();
-});
-</script>
+        
+        // Auto-generate QR code on page load
+        window.addEventListener('load', function() {
+            generateQR();
+        });
+    </script>
 </body>
 </html>
