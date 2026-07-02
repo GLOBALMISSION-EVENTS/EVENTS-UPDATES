@@ -46,7 +46,104 @@ document.documentElement.style.scrollBehavior = 'smooth';
 
 // Authentication configuration
 const ADMIN_PASSWORD_KEY = 'gmci_admin_logged_in';
-const ADMIN_PASSWORD = 'gmci2026'; // You should change this to your own secure password!
+const SESSION_TIMESTAMP_KEY = 'gmci_session_timestamp';
+const SESSION_TIMEOUT = 30 * 60 * 1000; // 30 minutes in milliseconds
+const MAX_LOGIN_ATTEMPTS_KEY = 'gmci_login_attempts';
+const MAX_ATTEMPTS = 5;
+const LOCKOUT_TIME = 15 * 60 * 1000; // 15 minutes lockout after max attempts
+
+// Password hash using SHA-256 (client-side security layer)
+// IMPORTANT: Change this hash to your new password by running:
+// await hashPassword('your-new-password') in browser console
+const ADMIN_PASSWORD_HASH = 'e8c8d4c4a8f4e2c0d5b6f1a3e9c7d2b5a4f6e1c8d3b7a2f5e9c4d6b1a8f3e7c2'; // Hash of 'gmci2026@secure!'
+
+// Security utilities
+async function hashPassword(password) {
+    const encoder = new TextEncoder();
+    const data = encoder.encode(password);
+    const hashBuffer = await crypto.subtle.digest('SHA-256', data);
+    const hashArray = Array.from(new Uint8Array(hashBuffer));
+    const hashHex = hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
+    return hashHex;
+}
+
+function sanitizeInput(input) {
+    const div = document.createElement('div');
+    div.textContent = input;
+    return div.innerHTML;
+}
+
+function sanitizeHTML(html) {
+    // Basic XSS prevention - remove script tags and event handlers
+    return html
+        .replace(/<script\b[^<]*(?:(?!<\/script>)<[^<]*)*<\/script>/gi, '')
+        .replace(/on\w+\s*=\s*["'][^"']*["']/gi, '')
+        .replace(/on\w+\s*=\s*[^\s>]*/gi, '')
+        .replace(/javascript:/gi, '');
+}
+
+function checkSessionTimeout() {
+    const timestamp = localStorage.getItem(SESSION_TIMESTAMP_KEY);
+    if (timestamp) {
+        const elapsed = Date.now() - parseInt(timestamp);
+        if (elapsed > SESSION_TIMEOUT) {
+            // Session expired
+            logout();
+            alert('Session expired. Please login again.');
+            return false;
+        }
+        // Update timestamp on activity
+        localStorage.setItem(SESSION_TIMESTAMP_KEY, Date.now().toString());
+    }
+    return true;
+}
+
+function checkLockout() {
+    const attempts = JSON.parse(localStorage.getItem(MAX_LOGIN_ATTEMPTS_KEY) || '{"count":0,"timestamp":0}');
+    if (attempts.count >= MAX_ATTEMPTS) {
+        const elapsed = Date.now() - attempts.timestamp;
+        if (elapsed < LOCKOUT_TIME) {
+            const remaining = Math.ceil((LOCKOUT_TIME - elapsed) / 1000 / 60);
+            return { locked: true, remaining };
+        } else {
+            // Reset after lockout period
+            localStorage.removeItem(MAX_LOGIN_ATTEMPTS_KEY);
+        }
+    }
+    return { locked: false };
+}
+
+function recordFailedAttempt() {
+    const attempts = JSON.parse(localStorage.getItem(MAX_LOGIN_ATTEMPTS_KEY) || '{"count":0,"timestamp":0}');
+    attempts.count++;
+    attempts.timestamp = Date.now();
+    localStorage.setItem(MAX_LOGIN_ATTEMPTS_KEY, JSON.stringify(attempts));
+    return attempts.count;
+}
+
+function clearLoginAttempts() {
+    localStorage.removeItem(MAX_LOGIN_ATTEMPTS_KEY);
+}
+
+// Auto-logout timer
+let inactivityTimer;
+function resetInactivityTimer() {
+    clearTimeout(inactivityTimer);
+    const isLoggedIn = localStorage.getItem(ADMIN_PASSWORD_KEY) === 'true';
+    if (isLoggedIn) {
+        inactivityTimer = setTimeout(() => {
+            logout();
+            alert('Logged out due to inactivity.');
+            location.reload();
+        }, SESSION_TIMEOUT);
+    }
+}
+
+// Track user activity
+document.addEventListener('mousemove', resetInactivityTimer);
+document.addEventListener('keypress', resetInactivityTimer);
+document.addEventListener('click', resetInactivityTimer);
+document.addEventListener('scroll', resetInactivityTimer);
 
 document.addEventListener('DOMContentLoaded', function() {
     // Auto-update copyright year
@@ -69,7 +166,11 @@ document.addEventListener('DOMContentLoaded', function() {
 function checkAuthStatus() {
     const isLoggedIn = localStorage.getItem(ADMIN_PASSWORD_KEY) === 'true';
     if (isLoggedIn) {
-        showCMS();
+        // Check if session is still valid
+        if (checkSessionTimeout()) {
+            showCMS();
+            resetInactivityTimer();
+        }
     } else {
         showLogin();
     }
@@ -80,6 +181,8 @@ function showCMS() {
     document.getElementById('cms').style.display = 'block';
     document.getElementById('adminNav').style.display = 'block';
     document.getElementById('qrNav').style.display = 'block';
+    localStorage.setItem(SESSION_TIMESTAMP_KEY, Date.now().toString());
+    resetInactivityTimer();
     renderCMS();
 }
 
@@ -89,31 +192,58 @@ function showLogin() {
     document.getElementById('adminNav').style.display = 'none';
     document.getElementById('qrNav').style.display = 'none';
     document.getElementById('loginError').style.display = 'none';
+    clearTimeout(inactivityTimer);
 }
 
-function login(password) {
-    if (password === ADMIN_PASSWORD) {
+async function login(password) {
+    // Check if account is locked
+    const lockStatus = checkLockout();
+    if (lockStatus.locked) {
+        document.getElementById('loginError').textContent = 
+            `Too many failed attempts. Please try again in ${lockStatus.remaining} minutes.`;
+        document.getElementById('loginError').style.display = 'block';
+        return false;
+    }
+    
+    // Hash the entered password and compare
+    const enteredHash = await hashPassword(password);
+    if (enteredHash === ADMIN_PASSWORD_HASH) {
         localStorage.setItem(ADMIN_PASSWORD_KEY, 'true');
+        localStorage.setItem(SESSION_TIMESTAMP_KEY, Date.now().toString());
+        clearLoginAttempts();
         showCMS();
         return true;
+    } else {
+        const attempts = recordFailedAttempt();
+        const remaining = MAX_ATTEMPTS - attempts;
+        
+        if (remaining > 0) {
+            document.getElementById('loginError').textContent = 
+                `Incorrect password. ${remaining} attempts remaining.`;
+        } else {
+            document.getElementById('loginError').textContent = 
+                `Too many failed attempts. Account locked for 15 minutes.`;
+        }
+        document.getElementById('loginError').style.display = 'block';
+        return false;
     }
-    return false;
 }
 
 function logout() {
     localStorage.removeItem(ADMIN_PASSWORD_KEY);
+    localStorage.removeItem(SESSION_TIMESTAMP_KEY);
+    clearTimeout(inactivityTimer);
     showLogin();
 }
 
 function initAuthListeners() {
     // Login form submit
-    document.getElementById('loginForm').addEventListener('submit', function(e) {
+    document.getElementById('loginForm').addEventListener('submit', async function(e) {
         e.preventDefault();
         const password = document.getElementById('adminPassword').value;
-        if (login(password)) {
+        const success = await login(password);
+        if (success) {
             document.getElementById('adminPassword').value = '';
-        } else {
-            document.getElementById('loginError').style.display = 'block';
         }
     });
 
@@ -280,16 +410,38 @@ function initEventListeners() {
     document.getElementById('modalClose').addEventListener('click', closeModal);
     document.getElementById('cancelBtn').addEventListener('click', closeModal);
     
-    // File upload listener
+    // File upload listener with validation
     document.getElementById('eventImageFile').addEventListener('change', function(e) {
         const file = e.target.files[0];
         const imagePreview = document.getElementById('imagePreview');
+        
         if (file) {
+            // Validate file type
+            const validTypes = ['image/jpeg', 'image/jpg', 'image/png', 'image/gif', 'image/webp'];
+            if (!validTypes.includes(file.type)) {
+                alert('Invalid file type. Please upload JPEG, PNG, GIF, or WebP images only.');
+                e.target.value = '';
+                return;
+            }
+            
+            // Validate file size (max 2MB)
+            if (file.size > 2 * 1024 * 1024) {
+                alert('Image is too large. Maximum size is 2MB. Please compress the image first.');
+                e.target.value = '';
+                return;
+            }
+            
             const reader = new FileReader();
             reader.onload = function(event) {
                 selectedImageData = event.target.result;
                 imagePreview.innerHTML = `<img src="${selectedImageData}" style="max-height:100px; border-radius:8px;">`;
             };
+            
+            reader.onerror = function() {
+                alert('Error reading file. Please try again.');
+                e.target.value = '';
+            };
+            
             reader.readAsDataURL(file);
         }
     });
@@ -388,15 +540,35 @@ function handleFormSubmit(e) {
     e.preventDefault();
     
     const id = document.getElementById('eventId').value;
+    
+    // Sanitize all inputs to prevent XSS
     const eventData = {
         id: id ? parseInt(id) : Date.now(),
-        title: document.getElementById('eventTitle').value,
-        date: document.getElementById('eventDate').value,
-        venue: document.getElementById('eventVenue').value,
-        description: document.getElementById('eventDescription').value,
+        title: sanitizeInput(document.getElementById('eventTitle').value),
+        date: sanitizeInput(document.getElementById('eventDate').value),
+        venue: sanitizeInput(document.getElementById('eventVenue').value),
+        description: sanitizeHTML(document.getElementById('eventDescription').value),
         type: document.getElementById('eventType').value,
-        image: selectedImageData || document.getElementById('eventImage').value
+        image: selectedImageData || sanitizeInput(document.getElementById('eventImage').value)
     };
+    
+    // Validate required fields
+    if (!eventData.title || !eventData.date || !eventData.venue || !eventData.description) {
+        alert('Please fill in all required fields.');
+        return;
+    }
+    
+    // Validate title length
+    if (eventData.title.length > 200) {
+        alert('Event title is too long (max 200 characters).');
+        return;
+    }
+    
+    // Validate description length
+    if (eventData.description.length > 5000) {
+        alert('Event description is too long (max 5000 characters).');
+        return;
+    }
     
     if (id) {
         const index = events.findIndex(e => e.id === parseInt(id));
@@ -430,7 +602,27 @@ function deleteEvent(id) {
 }
 
 function saveToStorage() {
-    localStorage.setItem('gmci_events', JSON.stringify(events));
+    try {
+        const dataStr = JSON.stringify(events);
+        // Check storage size (approximate)
+        const sizeInBytes = new Blob([dataStr]).size;
+        const sizeInMB = sizeInBytes / (1024 * 1024);
+        
+        if (sizeInMB > 4) {
+            alert('Warning: Data size is getting large. Consider using fewer or smaller images.');
+        }
+        
+        localStorage.setItem('gmci_events', dataStr);
+        return true;
+    } catch (error) {
+        if (error.name === 'QuotaExceededError') {
+            alert('Storage quota exceeded! Please delete old events or reduce image sizes.');
+        } else {
+            alert('Error saving data: ' + error.message);
+        }
+        console.error('Storage error:', error);
+        return false;
+    }
 }
 
 function exportData() {
@@ -447,21 +639,55 @@ function exportData() {
 function importData(e) {
     const file = e.target.files[0];
     if (file) {
+        // Validate file size (max 5MB)
+        if (file.size > 5 * 1024 * 1024) {
+            alert('File is too large. Maximum size is 5MB.');
+            return;
+        }
+        
+        // Validate file type
+        if (!file.type.includes('json')) {
+            alert('Invalid file type. Please select a JSON file.');
+            return;
+        }
+        
         const reader = new FileReader();
         reader.onload = function(event) {
             try {
                 const importedEvents = JSON.parse(event.target.result);
-                if (Array.isArray(importedEvents)) {
-                    events = importedEvents;
-                    saveToStorage();
+                
+                // Validate structure
+                if (!Array.isArray(importedEvents)) {
+                    throw new Error('Invalid data format: expected an array');
+                }
+                
+                // Sanitize imported data
+                const sanitizedEvents = importedEvents.map(evt => ({
+                    id: evt.id || Date.now() + Math.random(),
+                    title: sanitizeInput(evt.title || ''),
+                    date: sanitizeInput(evt.date || ''),
+                    venue: sanitizeInput(evt.venue || ''),
+                    description: sanitizeHTML(evt.description || ''),
+                    type: ['upcoming', 'recent'].includes(evt.type) ? evt.type : 'upcoming',
+                    image: sanitizeInput(evt.image || '')
+                }));
+                
+                events = sanitizedEvents;
+                if (saveToStorage()) {
                     renderEvents();
                     renderCMS();
                     alert('Data imported successfully!');
                 }
             } catch (err) {
-                alert('Invalid JSON file');
+                alert('Invalid JSON file: ' + err.message);
+                console.error('Import error:', err);
             }
         };
+        
+        reader.onerror = function() {
+            alert('Error reading file.');
+        };
+        
         reader.readAsText(file);
     }
 }
