@@ -44,13 +44,9 @@ document.addEventListener('DOMContentLoaded', async function() {
     document.getElementById('copyright-year').textContent = new Date().getFullYear();
     
     // Wait for Supabase to be ready
-    let retries = 0;
-    while (!window.getSupabase() && retries < 20) {
-        await new Promise(resolve => setTimeout(resolve, 100));
-        retries++;
-    }
+    const supabaseReady = await window.waitForSupabase();
     
-    if (!window.getSupabase()) {
+    if (!supabaseReady) {
         console.error('Failed to initialize Supabase');
         alert('Failed to connect to database. Please refresh the page.');
         return;

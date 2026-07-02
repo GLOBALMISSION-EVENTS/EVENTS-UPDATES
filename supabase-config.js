@@ -4,27 +4,49 @@ const SUPABASE_CONFIG = {
     anonKey: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inl4cmtwcGVocXpiYXVuem53cWlpIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Mzg5NjM5OTMsImV4cCI6MjA1NDUzOTk5M30.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inl4cmtwcGVocXpiYXVuem53cWlpIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Mzg5NjM5OTMsImV4cCI6MjA1NDUzOTk5M30'
 };
 
-// Initialize Supabase client
-let supabase;
+// Global Supabase client - will be initialized when library loads
+window.supabaseClient = null;
+window.supabaseReady = false;
 
-// Wait for Supabase library to load, then initialize
-if (typeof window !== 'undefined') {
-    // Check if supabase library is loaded
-    const initSupabase = () => {
-        if (typeof window.supabase !== 'undefined' && window.supabase.createClient) {
-            supabase = window.supabase.createClient(SUPABASE_CONFIG.url, SUPABASE_CONFIG.anonKey);
-            console.log('✅ Supabase initialized successfully');
-            return true;
+// Initialize Supabase when the library is available
+function initializeSupabase() {
+    try {
+        // Check if the Supabase library is loaded
+        if (typeof window.supabase === 'undefined' || !window.supabase.createClient) {
+            console.log('Waiting for Supabase library...');
+            return false;
         }
-        return false;
-    };
 
-    // Try to initialize immediately
-    if (!initSupabase()) {
-        // If not loaded yet, wait for DOMContentLoaded
-        document.addEventListener('DOMContentLoaded', initSupabase);
+        // Create the client
+        window.supabaseClient = window.supabase.createClient(
+            SUPABASE_CONFIG.url, 
+            SUPABASE_CONFIG.anonKey
+        );
+        
+        window.supabaseReady = true;
+        console.log('✅ Supabase initialized successfully');
+        return true;
+    } catch (error) {
+        console.error('Error initializing Supabase:', error);
+        return false;
     }
 }
 
-// Export for use in other files
-window.getSupabase = () => supabase;
+// Helper function to get Supabase client
+window.getSupabase = function() {
+    return window.supabaseClient;
+};
+
+// Helper to wait for Supabase to be ready
+window.waitForSupabase = async function(maxRetries = 30) {
+    for (let i = 0; i < maxRetries; i++) {
+        if (window.supabaseReady) {
+            return true;
+        }
+        if (initializeSupabase()) {
+            return true;
+        }
+        await new Promise(resolve => setTimeout(resolve, 100));
+    }
+    return false;
+};
