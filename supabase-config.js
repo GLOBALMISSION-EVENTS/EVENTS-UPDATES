@@ -1,7 +1,7 @@
 // Supabase Configuration
 const SUPABASE_CONFIG = {
     url: 'https://yxrkpxehqzbaunznwqii.supabase.co',
-    anonKey: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inl4cmtwcGVocXpiYXVuem53cWlpIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Mzg5NjM5OTMsImV4cCI6MjA1NDUzOTk5M30.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inl4cmtwcGVocXpiYXVuem53cWlpIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Mzg5NjM5OTMsImV4cCI6MjA1NDUzOTk5M30'
+    anonKey: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inl4cmtweGVocXpiYXVuem52cWlpIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODI5Mzc4MjEsImV4cCI6MjA5ODUxMzgyMX0.sWTVPDAwz1NG9IzRrWTLcD7a8eT3q5emg_oqkAiez48'
 };
 
 // Global Supabase client - will be initialized when library loads
