@@ -284,7 +284,13 @@ const EventsTab = ({
 
       {deleteConfirmId && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
-          <div className="absolute inset-0 bg-black/60 backdrop-blur-sm" onClick={() => setDeleteConfirmId(null)} />
+          <div
+            className="absolute inset-0 bg-black/60 backdrop-blur-sm"
+            onClick={() => setDeleteConfirmId(null)}
+            onKeyDown={(e) => { if (e.key === 'Escape') setDeleteConfirmId(null) }}
+            role="button"
+            tabIndex={0}
+          />
           <div className="relative bg-white rounded-2xl shadow-2xl w-full max-w-md p-8 text-center">
             <h3 className="text-2xl font-bold text-text-dark mb-4">Confirm Delete</h3>
             <p className="text-text-light mb-6">
@@ -578,7 +584,13 @@ const HeroTab = ({
 
       {deleteConfirmId && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
-          <div className="absolute inset-0 bg-black/60 backdrop-blur-sm" onClick={() => setDeleteConfirmId(null)} />
+          <div
+            className="absolute inset-0 bg-black/60 backdrop-blur-sm"
+            onClick={() => setDeleteConfirmId(null)}
+            onKeyDown={(e) => { if (e.key === 'Escape') setDeleteConfirmId(null) }}
+            role="button"
+            tabIndex={0}
+          />
           <div className="relative bg-white rounded-2xl shadow-2xl w-full max-w-md p-8 text-center">
             <h3 className="text-2xl font-bold text-text-dark mb-4">Confirm Delete</h3>
             <p className="text-text-light mb-6">Are you sure you want to delete this slide?</p>
@@ -639,8 +651,9 @@ const HeroTab = ({
       >
         <form onSubmit={handleSubmit} className="space-y-4">
           <div>
-            <label className="block text-sm font-semibold text-text-dark mb-2">Image Path/URL</label>
+            <label htmlFor="hero-image" className="block text-sm font-semibold text-text-dark mb-2">Image Path/URL</label>
             <Input
+              id="hero-image"
               value={formData.image}
               onChange={(e) => setFormData((prev) => ({ ...prev, image: e.target.value }))}
               placeholder="e.g., /images/hero/slide1.jpg"
@@ -648,8 +661,9 @@ const HeroTab = ({
             />
           </div>
           <div>
-            <label className="block text-sm font-semibold text-text-dark mb-2">Alt Text</label>
+            <label htmlFor="hero-alt" className="block text-sm font-semibold text-text-dark mb-2">Alt Text</label>
             <Input
+              id="hero-alt"
               value={formData.alt}
               onChange={(e) => setFormData((prev) => ({ ...prev, alt: e.target.value }))}
               placeholder="e.g., Worship Service"
@@ -677,41 +691,21 @@ interface AboutTabProps {
 }
 
 const AboutTab = ({ content, onUpdateContent }: AboutTabProps) => {
-  const [formData, setFormData] = useState({
-    vision: '',
-    mission: '',
-    values: '',
-    directorName: '',
-    directorTitle: '',
-    directorImage: '',
-    directorMessage: '',
-    aboutImage: '',
-    contactPhone: '',
-    contactEmail: '',
-    contactTwitter: '',
-    contactYoutube: '',
-    contactAddress: '',
-  })
-
-  useEffect(() => {
-    if (content) {
-      setFormData({
-        vision: content.vision || '',
-        mission: content.mission || '',
-        values: (content.values || []).join('\n'),
-        directorName: content.directorName || '',
-        directorTitle: content.directorTitle || '',
-        directorImage: content.directorImage || '',
-        directorMessage: (content.directorMessage || []).join('\n\n'),
-        aboutImage: content.aboutImage || '',
-        contactPhone: (content.contactPhone || []).join(', '),
-        contactEmail: (content.contactEmail || []).join(', '),
-        contactTwitter: content.contactTwitter || '',
-        contactYoutube: content.contactYoutube || '',
-        contactAddress: (content.contactAddress || []).join(', '),
-      })
-    }
-  }, [content])
+  const [formData, setFormData] = useState(() => ({
+    vision: content?.vision || '',
+    mission: content?.mission || '',
+    values: (content?.values || []).join('\n'),
+    directorName: content?.directorName || '',
+    directorTitle: content?.directorTitle || '',
+    directorImage: content?.directorImage || '',
+    directorMessage: (content?.directorMessage || []).join('\n\n'),
+    aboutImage: content?.aboutImage || '',
+    contactPhone: (content?.contactPhone || []).join(', '),
+    contactEmail: (content?.contactEmail || []).join(', '),
+    contactTwitter: content?.contactTwitter || '',
+    contactYoutube: content?.contactYoutube || '',
+    contactAddress: (content?.contactAddress || []).join(', '),
+  }))
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault()
@@ -741,56 +735,56 @@ const AboutTab = ({ content, onUpdateContent }: AboutTabProps) => {
       <div className="max-w-3xl mx-auto">
         <form onSubmit={handleSubmit} className="space-y-4 bg-white rounded-xl p-8 shadow-lg">
           <div>
-            <label className="block text-sm font-semibold text-text-dark mb-2">Vision</label>
-            <Textarea value={formData.vision} onChange={(e) => setFormData((prev) => ({ ...prev, vision: e.target.value }))} />
+            <label htmlFor="about-vision" className="block text-sm font-semibold text-text-dark mb-2">Vision</label>
+            <Textarea id="about-vision" value={formData.vision} onChange={(e) => setFormData((prev) => ({ ...prev, vision: e.target.value }))} />
           </div>
           <div>
-            <label className="block text-sm font-semibold text-text-dark mb-2">Mission</label>
-            <Textarea value={formData.mission} onChange={(e) => setFormData((prev) => ({ ...prev, mission: e.target.value }))} />
+            <label htmlFor="about-mission" className="block text-sm font-semibold text-text-dark mb-2">Mission</label>
+            <Textarea id="about-mission" value={formData.mission} onChange={(e) => setFormData((prev) => ({ ...prev, mission: e.target.value }))} />
           </div>
           <div>
-            <label className="block text-sm font-semibold text-text-dark mb-2">Values (one per line)</label>
-            <Textarea value={formData.values} onChange={(e) => setFormData((prev) => ({ ...prev, values: e.target.value }))} rows={5} />
+            <label htmlFor="about-values" className="block text-sm font-semibold text-text-dark mb-2">Values (one per line)</label>
+            <Textarea id="about-values" value={formData.values} onChange={(e) => setFormData((prev) => ({ ...prev, values: e.target.value }))} rows={5} />
           </div>
           <div>
-            <label className="block text-sm font-semibold text-text-dark mb-2">Director Name</label>
-            <Input value={formData.directorName} onChange={(e) => setFormData((prev) => ({ ...prev, directorName: e.target.value }))} />
+            <label htmlFor="about-director-name" className="block text-sm font-semibold text-text-dark mb-2">Director Name</label>
+            <Input id="about-director-name" value={formData.directorName} onChange={(e) => setFormData((prev) => ({ ...prev, directorName: e.target.value }))} />
           </div>
           <div>
-            <label className="block text-sm font-semibold text-text-dark mb-2">Director Title</label>
-            <Input value={formData.directorTitle} onChange={(e) => setFormData((prev) => ({ ...prev, directorTitle: e.target.value }))} />
+            <label htmlFor="about-director-title" className="block text-sm font-semibold text-text-dark mb-2">Director Title</label>
+            <Input id="about-director-title" value={formData.directorTitle} onChange={(e) => setFormData((prev) => ({ ...prev, directorTitle: e.target.value }))} />
           </div>
           <div>
-            <label className="block text-sm font-semibold text-text-dark mb-2">Director Image Path</label>
-            <Input value={formData.directorImage} onChange={(e) => setFormData((prev) => ({ ...prev, directorImage: e.target.value }))} />
+            <label htmlFor="about-director-image" className="block text-sm font-semibold text-text-dark mb-2">Director Image Path</label>
+            <Input id="about-director-image" value={formData.directorImage} onChange={(e) => setFormData((prev) => ({ ...prev, directorImage: e.target.value }))} />
           </div>
           <div>
-            <label className="block text-sm font-semibold text-text-dark mb-2">Director Message (paragraphs separated by blank line)</label>
-            <Textarea value={formData.directorMessage} onChange={(e) => setFormData((prev) => ({ ...prev, directorMessage: e.target.value }))} rows={6} />
+            <label htmlFor="about-director-message" className="block text-sm font-semibold text-text-dark mb-2">Director Message (paragraphs separated by blank line)</label>
+            <Textarea id="about-director-message" value={formData.directorMessage} onChange={(e) => setFormData((prev) => ({ ...prev, directorMessage: e.target.value }))} rows={6} />
           </div>
           <div>
-            <label className="block text-sm font-semibold text-text-dark mb-2">About Image Path</label>
-            <Input value={formData.aboutImage} onChange={(e) => setFormData((prev) => ({ ...prev, aboutImage: e.target.value }))} />
+            <label htmlFor="about-image" className="block text-sm font-semibold text-text-dark mb-2">About Image Path</label>
+            <Input id="about-image" value={formData.aboutImage} onChange={(e) => setFormData((prev) => ({ ...prev, aboutImage: e.target.value }))} />
           </div>
           <div>
-            <label className="block text-sm font-semibold text-text-dark mb-2">Contact Phone (comma separated)</label>
-            <Input value={formData.contactPhone} onChange={(e) => setFormData((prev) => ({ ...prev, contactPhone: e.target.value }))} />
+            <label htmlFor="about-contact-phone" className="block text-sm font-semibold text-text-dark mb-2">Contact Phone (comma separated)</label>
+            <Input id="about-contact-phone" value={formData.contactPhone} onChange={(e) => setFormData((prev) => ({ ...prev, contactPhone: e.target.value }))} />
           </div>
           <div>
-            <label className="block text-sm font-semibold text-text-dark mb-2">Contact Email (comma separated)</label>
-            <Input value={formData.contactEmail} onChange={(e) => setFormData((prev) => ({ ...prev, contactEmail: e.target.value }))} />
+            <label htmlFor="about-contact-email" className="block text-sm font-semibold text-text-dark mb-2">Contact Email (comma separated)</label>
+            <Input id="about-contact-email" value={formData.contactEmail} onChange={(e) => setFormData((prev) => ({ ...prev, contactEmail: e.target.value }))} />
           </div>
           <div>
-            <label className="block text-sm font-semibold text-text-dark mb-2">Twitter Handle</label>
-            <Input value={formData.contactTwitter} onChange={(e) => setFormData((prev) => ({ ...prev, contactTwitter: e.target.value }))} />
+            <label htmlFor="about-twitter" className="block text-sm font-semibold text-text-dark mb-2">Twitter Handle</label>
+            <Input id="about-twitter" value={formData.contactTwitter} onChange={(e) => setFormData((prev) => ({ ...prev, contactTwitter: e.target.value }))} />
           </div>
           <div>
-            <label className="block text-sm font-semibold text-text-dark mb-2">YouTube</label>
-            <Input value={formData.contactYoutube} onChange={(e) => setFormData((prev) => ({ ...prev, contactYoutube: e.target.value }))} />
+            <label htmlFor="about-youtube" className="block text-sm font-semibold text-text-dark mb-2">YouTube</label>
+            <Input id="about-youtube" value={formData.contactYoutube} onChange={(e) => setFormData((prev) => ({ ...prev, contactYoutube: e.target.value }))} />
           </div>
           <div>
-            <label className="block text-sm font-semibold text-text-dark mb-2">Contact Address (comma separated)</label>
-            <Input value={formData.contactAddress} onChange={(e) => setFormData((prev) => ({ ...prev, contactAddress: e.target.value }))} />
+            <label htmlFor="about-contact-address" className="block text-sm font-semibold text-text-dark mb-2">Contact Address (comma separated)</label>
+            <Input id="about-contact-address" value={formData.contactAddress} onChange={(e) => setFormData((prev) => ({ ...prev, contactAddress: e.target.value }))} />
           </div>
           <div className="pt-4">
             <Button type="submit" className="w-full">
