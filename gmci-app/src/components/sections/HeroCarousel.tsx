@@ -104,7 +104,7 @@ export const HeroCarousel = ({ slides = [] }: HeroCarouselProps) => {
 
           <div className="h-8 flex items-center justify-center mb-10">
             <p className="text-sm md:text-base text-secondary/80 font-medium italic transition-all duration-500">
-              "{SCRIPTURES[scriptureIndex]}"
+              &quot;{SCRIPTURES[scriptureIndex]}&quot;
             </p>
           </div>
 
