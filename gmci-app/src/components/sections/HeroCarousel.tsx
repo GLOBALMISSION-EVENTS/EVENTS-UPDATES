@@ -1,47 +1,25 @@
 import { useState, useEffect, useCallback } from 'react'
 import { ChevronLeft, ChevronRight } from 'lucide-react'
 import { getImageUrl } from '@/lib/utils'
+import type { HeroSlide } from '@/types'
 
-const SLIDES = [
-  {
-    id: 1,
-    image: '/images/hero images/global.jpg',
-    alt: 'Global Mission',
-  },
-  {
-    id: 2,
-    image: '/images/hero images/global 2.jpg',
-    alt: 'Worship Service',
-  },
-  {
-    id: 3,
-    image: '/images/hero images/global4.webp',
-    alt: 'Humanitarian Work',
-  },
-  {
-    id: 4,
-    image: '/images/hero images/global.webp',
-    alt: 'Community Outreach',
-  },
-  {
-    id: 5,
-    image: '/images/hero images/global5.webp',
-    alt: 'Prayer Gathering',
-  },
-]
+interface HeroCarouselProps {
+  slides?: HeroSlide[]
+}
 
 const AUTO_PLAY_INTERVAL = 12000
 
-export const HeroCarousel = () => {
+export const HeroCarousel = ({ slides = [] }: HeroCarouselProps) => {
   const [currentSlide, setCurrentSlide] = useState(0)
+  const slideCount = slides.length || 1
 
   const nextSlide = useCallback(() => {
-    setCurrentSlide((prev) => (prev + 1) % SLIDES.length)
-  }, [])
+    setCurrentSlide((prev) => (prev + 1) % slideCount)
+  }, [slideCount])
 
   const prevSlide = useCallback(() => {
-    setCurrentSlide((prev) => (prev - 1 + SLIDES.length) % SLIDES.length)
-  }, [])
+    setCurrentSlide((prev) => (prev - 1 + slideCount) % slideCount)
+  }, [slideCount])
 
   const goToSlide = (index: number) => {
     setCurrentSlide(index)
@@ -54,7 +32,7 @@ export const HeroCarousel = () => {
 
   return (
     <div className="relative w-full h-screen overflow-hidden">
-      {SLIDES.map((slide, index) => (
+      {slides.map((slide, index) => (
         <div
           key={slide.id}
           className={`absolute inset-0 transition-opacity duration-[2500ms] ease-in-out ${
@@ -113,7 +91,7 @@ export const HeroCarousel = () => {
       </div>
 
       <div className="absolute bottom-16 left-1/2 -translate-x-1/2 z-40 flex gap-3">
-        {SLIDES.map((_, index) => (
+        {slides.map((_, index) => (
           <button
             key={index}
             onClick={() => goToSlide(index)}

@@ -2,9 +2,9 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { supabase } from '@/lib/supabase'
 import type { Event } from '@/types'
 
-const INITIAL_EVENTS: Event[] = [
+const INITIAL_EVENTS: Omit<Event, 'id'>[] = [
   {
-    id: 1,
+    position: 1,
     title: 'Mission Impact Breakfast',
     date: '10th July 2026 - 9AM',
     venue: 'Y.M.C.A. Hall - Nyeri Town',
@@ -13,7 +13,7 @@ const INITIAL_EVENTS: Event[] = [
     image: '/images/breakfast-poster.png',
   },
   {
-    id: 2,
+    position: 2,
     title: '5th Annual Mega Conference & Free Medical Camp',
     date: '9-16th August 2026 from 9AM',
     venue: 'Kiamariga Nursery Grounds',
@@ -22,7 +22,7 @@ const INITIAL_EVENTS: Event[] = [
     image: '/images/about-us.png',
   },
   {
-    id: 3,
+    position: 3,
     title: 'Conference & Medical Camp @ Kiamariga',
     date: '9th -16th August 2026',
     venue: 'Kiamariga',
@@ -41,19 +41,22 @@ export const useEvents = () => {
       const { data, error } = await supabase
         .from('events')
         .select('*')
-        .order('id', { ascending: true })
+        .order('position', { ascending: true })
 
       if (error) {
         console.error('Error fetching events:', error)
-        return INITIAL_EVENTS
+        return []
       }
 
       if (!data || data.length === 0) {
-        // Initialize with default events if table is empty
         for (const event of INITIAL_EVENTS) {
           await supabase.from('events').insert(event)
         }
-        return INITIAL_EVENTS
+        const { data: seeded } = await supabase
+          .from('events')
+          .select('*')
+          .order('position', { ascending: true })
+        return (seeded || []) as Event[]
       }
 
       return data as Event[]
@@ -62,9 +65,10 @@ export const useEvents = () => {
 
   const addEventMutation = useMutation({
     mutationFn: async (newEvent: Omit<Event, 'id'>) => {
+      const maxPosition = events.reduce((max, e) => Math.max(max, e.position || 0), 0)
       const { data, error } = await supabase
         .from('events')
-        .insert(newEvent)
+        .insert({ ...newEvent, position: maxPosition + 1 })
         .select()
         .single()
 
@@ -105,11 +109,10 @@ export const useEvents = () => {
 
   const reorderEventsMutation = useMutation({
     mutationFn: async (newOrder: Event[]) => {
-      // Update each event's position (we'll use id for simplicity for now)
       for (let i = 0; i < newOrder.length; i++) {
         await supabase
           .from('events')
-          .update({ id: newOrder[i].id }) // In a real app, you'd have a position column
+          .update({ position: i + 1 })
           .eq('id', newOrder[i].id)
       }
       return newOrder
@@ -136,10 +139,9 @@ export const useEvents = () => {
   }
 
   const resetEvents = async () => {
-    // Delete all events and re-insert initial ones
     await supabase.from('events').delete().neq('id', 0)
-    for (const event of INITIAL_EVENTS) {
-      await supabase.from('events').insert(event)
+    for (let i = 0; i < INITIAL_EVENTS.length; i++) {
+      await supabase.from('events').insert({ ...INITIAL_EVENTS[i], position: i + 1 })
     }
     queryClient.invalidateQueries({ queryKey: ['events'] })
   }
@@ -161,10 +163,9 @@ export const useEvents = () => {
       try {
         const imported = JSON.parse(e.target?.result as string)
         if (Array.isArray(imported)) {
-          // Delete existing events and import new ones
           await supabase.from('events').delete().neq('id', 0)
-          for (const event of imported) {
-            await supabase.from('events').insert(event)
+          for (let i = 0; i < imported.length; i++) {
+            await supabase.from('events').insert({ ...imported[i], position: i + 1 })
           }
           queryClient.invalidateQueries({ queryKey: ['events'] })
         }

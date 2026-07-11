@@ -5,6 +5,7 @@ import type { Event } from '@/types'
 
 const testEvent: Event = {
   id: 1,
+  position: 1,
   title: 'Test Event',
   date: 'July 15, 2026',
   venue: 'Test Venue',

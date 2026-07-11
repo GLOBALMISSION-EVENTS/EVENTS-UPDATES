@@ -4,8 +4,8 @@ import { EventsSection } from './EventsSection'
 import type { Event } from '@/types'
 
 const testEvents: Event[] = [
-  { id: 1, title: 'Upcoming 1', date: '', venue: '', description: '', type: 'upcoming' },
-  { id: 2, title: 'Recent 1', date: '', venue: '', description: '', type: 'recent' },
+  { id: 1, position: 1, title: 'Upcoming 1', date: '', venue: '', description: '', type: 'upcoming' },
+  { id: 2, position: 2, title: 'Recent 1', date: '', venue: '', description: '', type: 'recent' },
 ]
 
 describe('EventsSection', () => {

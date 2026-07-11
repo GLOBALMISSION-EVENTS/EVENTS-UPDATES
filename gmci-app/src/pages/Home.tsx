@@ -8,6 +8,9 @@ import { CMSSection } from '@/components/sections/CMSSection'
 import { LoginSection } from '@/components/sections/LoginSection'
 import { useEvents } from '@/hooks/useEvents'
 import { useAuth } from '@/hooks/useAuth'
+import { useHeroSlides } from '@/hooks/useHeroSlides'
+import { useAboutContent } from '@/hooks/useAboutContent'
+import type { AboutContent } from '@/types'
 
 export const Home = () => {
   const {
@@ -21,6 +24,11 @@ export const Home = () => {
     exportEvents,
     importEvents,
   } = useEvents()
+
+  const { slides, addSlide, updateSlide, deleteSlide, reorderSlides } = useHeroSlides()
+
+  const { content: aboutContent, updateContent } = useAboutContent()
+  const cmsAboutContent: AboutContent | null = aboutContent ?? null
 
   const { isLoggedIn, isLoading: authLoading, login, forgotPassword, logout } = useAuth()
 
@@ -36,7 +44,7 @@ export const Home = () => {
     <div className="min-h-screen">
       <header id="home" className="relative bg-dark">
         <Navbar isLoggedIn={isLoggedIn} onLogout={logout} />
-        <HeroCarousel />
+        <HeroCarousel slides={slides} />
       </header>
 
       <main>
@@ -47,7 +55,7 @@ export const Home = () => {
         ) : (
           <EventsSection events={events} />
         )}
-        <AboutSection />
+        <AboutSection content={cmsAboutContent} />
         
         {isLoggedIn ? (
           <CMSSection
@@ -59,6 +67,13 @@ export const Home = () => {
             onResetEvents={resetEvents}
             onExportEvents={exportEvents}
             onImportEvents={importEvents}
+            heroSlides={slides}
+            onAddSlide={addSlide}
+            onUpdateSlide={updateSlide}
+            onDeleteSlide={deleteSlide}
+            onReorderSlides={reorderSlides}
+            aboutContent={cmsAboutContent}
+            onUpdateAboutContent={updateContent}
           />
         ) : (
           <LoginSection onLogin={login} onForgotPassword={forgotPassword} />
