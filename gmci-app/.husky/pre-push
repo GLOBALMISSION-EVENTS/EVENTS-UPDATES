@@ -1,1 +1,32 @@
-npm run ci-check
+#!/bin/sh
+
+# GMCI Pre-Push Hook - Ensures local code quality matches CI requirements
+echo "🔍 Running pre-push quality checks..."
+echo "This ensures your code will pass CI validation ✅"
+echo ""
+
+# Change to the gmci-app directory
+cd gmci-app || exit 1
+
+# Run the full CI check pipeline locally
+echo "📝 Running ESLint..."
+npm run lint || {
+  echo "❌ ESLint failed! Fix linting errors before pushing."
+  exit 1
+}
+
+echo "🧪 Running tests with coverage..."
+npm run test:coverage || {
+  echo "❌ Tests failed! Fix failing tests before pushing."
+  exit 1
+}
+
+echo "🏗️  Running build..."
+npm run build || {
+  echo "❌ Build failed! Fix TypeScript/build errors before pushing."
+  exit 1
+}
+
+echo ""
+echo "✅ All quality checks passed! Push proceeding..."
+echo "🚀 Your code is ready for CI validation."

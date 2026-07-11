@@ -1,1 +1,24 @@
-npm test
+#!/bin/sh
+
+# GMCI Pre-Commit Hook - Fast quality checks for commits
+echo "🔍 Running pre-commit checks..."
+
+# Change to the gmci-app directory
+cd gmci-app || exit 1
+
+# Run fast linting check
+echo "📝 Running ESLint..."
+npm run lint || {
+  echo "❌ ESLint failed! Fix linting errors before committing."
+  echo "💡 Run 'npm run lint:fix' to auto-fix some issues."
+  exit 1
+}
+
+# Run fast test suite (without coverage for speed)
+echo "🧪 Running tests..."
+npm test || {
+  echo "❌ Tests failed! Fix failing tests before committing."
+  exit 1
+}
+
+echo "✅ Pre-commit checks passed!"
