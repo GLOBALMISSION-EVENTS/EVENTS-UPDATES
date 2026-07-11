@@ -15,7 +15,7 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
-  build:
+  validate:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
@@ -31,6 +31,12 @@ jobs:
       - name: Install dependencies
         run: cd gmci-app && npm ci
 
+      - name: Lint
+        run: cd gmci-app && npm run lint
+
+      - name: Test
+        run: cd gmci-app && npm run test:coverage
+
       - name: Build
         run: cd gmci-app && npm run build
 
@@ -43,7 +49,7 @@ jobs:
           path: 'gmci-app/dist'
 
   deploy:
-    needs: build
+    needs: validate
     environment:
       name: github-pages
       url: ${{ steps.deployment.outputs.page_url }}

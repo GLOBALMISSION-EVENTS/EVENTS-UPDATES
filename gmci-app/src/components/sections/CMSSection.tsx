@@ -234,10 +234,11 @@ export const CMSSection = ({
       >
         <form onSubmit={handleSubmit} className="space-y-4">
           <div>
-            <label className="block text-sm font-semibold text-text-dark mb-2">
+            <label htmlFor="cms-event-title" className="block text-sm font-semibold text-text-dark mb-2">
               Event Title
             </label>
             <Input
+              id="cms-event-title"
               value={formData.title}
               onChange={(e) =>
                 setFormData((prev) => ({ ...prev, title: e.target.value }))
@@ -247,10 +248,11 @@ export const CMSSection = ({
           </div>
 
           <div>
-            <label className="block text-sm font-semibold text-text-dark mb-2">
+            <label htmlFor="cms-event-date" className="block text-sm font-semibold text-text-dark mb-2">
               Date
             </label>
             <Input
+              id="cms-event-date"
               value={formData.date}
               onChange={(e) =>
                 setFormData((prev) => ({ ...prev, date: e.target.value }))
@@ -261,10 +263,11 @@ export const CMSSection = ({
           </div>
 
           <div>
-            <label className="block text-sm font-semibold text-text-dark mb-2">
+            <label htmlFor="cms-event-venue" className="block text-sm font-semibold text-text-dark mb-2">
               Venue
             </label>
             <Input
+              id="cms-event-venue"
               value={formData.venue}
               onChange={(e) =>
                 setFormData((prev) => ({ ...prev, venue: e.target.value }))
@@ -275,10 +278,11 @@ export const CMSSection = ({
           </div>
 
           <div>
-            <label className="block text-sm font-semibold text-text-dark mb-2">
+            <label htmlFor="cms-event-description" className="block text-sm font-semibold text-text-dark mb-2">
               Description
             </label>
             <Textarea
+              id="cms-event-description"
               value={formData.description}
               onChange={(e) =>
                 setFormData((prev) => ({ ...prev, description: e.target.value }))
@@ -288,10 +292,11 @@ export const CMSSection = ({
           </div>
 
           <div>
-            <label className="block text-sm font-semibold text-text-dark mb-2">
+            <label htmlFor="cms-event-type" className="block text-sm font-semibold text-text-dark mb-2">
               Event Type
             </label>
             <select
+              id="cms-event-type"
               value={formData.type}
               onChange={(e) =>
                 setFormData((prev) => ({
@@ -307,10 +312,11 @@ export const CMSSection = ({
           </div>
 
           <div>
-            <label className="block text-sm font-semibold text-text-dark mb-2">
+            <label htmlFor="cms-event-image-file" className="block text-sm font-semibold text-text-dark mb-2">
               Upload Image from Computer
             </label>
             <Input
+              id="cms-event-image-file"
               type="file"
               accept="image/*"
               onChange={handleImageFileChange}
@@ -327,10 +333,11 @@ export const CMSSection = ({
           </div>
 
           <div>
-            <label className="block text-sm font-semibold text-text-dark mb-2">
+            <label htmlFor="cms-event-image-url" className="block text-sm font-semibold text-text-dark mb-2">
               OR Image Path/URL (optional)
             </label>
             <Input
+              id="cms-event-image-url"
               value={formData.image}
               onChange={(e) =>
                 setFormData((prev) => ({ ...prev, image: e.target.value }))

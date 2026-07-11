@@ -14,11 +14,7 @@ export const QRCodeGenerator = () => {
   const canvasRef = useRef<HTMLCanvasElement>(null)
   const { isLoggedIn, logout } = useAuth()
 
-  useEffect(() => {
-    generateQRCode()
-  }, [url, size])
-
-  const generateQRCode = () => {
+  const generateQRCode = React.useCallback(() => {
     if (!url) return
 
     QRCode.toCanvas(canvasRef.current, url, {
@@ -32,7 +28,11 @@ export const QRCodeGenerator = () => {
     }, (error: unknown) => {
       if (error) console.error(error)
     })
-  }
+  }, [url, size])
+
+  useEffect(() => {
+    generateQRCode()
+  }, [url, size, generateQRCode])
 
   const downloadPNG = () => {
     if (!canvasRef.current) return
@@ -88,10 +88,11 @@ export const QRCodeGenerator = () => {
 
             <div className="space-y-6 mb-8">
               <div>
-                <label className="block text-sm font-semibold text-text-dark mb-2">
+                <label htmlFor="qr-url" className="block text-sm font-semibold text-text-dark mb-2">
                   URL
                 </label>
                 <Input
+                  id="qr-url"
                   value={url}
                   onChange={(e) => setUrl(e.target.value)}
                   placeholder="https://example.com"
@@ -99,9 +100,9 @@ export const QRCodeGenerator = () => {
               </div>
 
               <div>
-                <label className="block text-sm font-semibold text-text-dark mb-2">
+                <div className="block text-sm font-semibold text-text-dark mb-2">
                   QR Code Size (pixels)
-                </label>
+                </div>
                 <div className="flex gap-4">
                   {[256, 512, 1024, 2048].map((s) => (
                     <Button

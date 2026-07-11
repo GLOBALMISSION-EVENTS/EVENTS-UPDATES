@@ -62,7 +62,7 @@ export const AboutSection = () => {
                   className="w-24 h-24 rounded-full object-cover"
                 />
                 <div>
-                  <h3 className="text-2xl font-bold text-text-dark">Director's Message</h3>
+                  <h3 className="text-2xl font-bold text-text-dark">Director&apos;s Message</h3>
                   <p className="text-secondary font-semibold">Rev. Dr. Anthony Waithaka</p>
                   <p className="text-text-light">Director, Global Mission for Christ International</p>
                 </div>
