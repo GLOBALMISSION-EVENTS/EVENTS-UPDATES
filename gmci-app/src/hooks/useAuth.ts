@@ -40,6 +40,22 @@ export const useAuth = () => {
     }
   }
 
+  const forgotPassword = async (email: string): Promise<boolean> => {
+    try {
+      const { error } = await supabase.auth.resetPasswordForEmail(email, {
+        redirectTo: `${window.location.origin}/EVENTS-UPDATES/`,
+      })
+      if (error) {
+        console.error('Forgot password error:', error)
+        return false
+      }
+      return true
+    } catch (error) {
+      console.error('Forgot password error:', error)
+      return false
+    }
+  }
+
   const logout = async () => {
     try {
       await supabase.auth.signOut()
@@ -52,6 +68,7 @@ export const useAuth = () => {
     isLoggedIn,
     isLoading,
     login,
+    forgotPassword,
     logout,
   }
 }

@@ -22,7 +22,7 @@ export const Home = () => {
     importEvents,
   } = useEvents()
 
-  const { isLoggedIn, isLoading: authLoading, login, logout } = useAuth()
+  const { isLoggedIn, isLoading: authLoading, login, forgotPassword, logout } = useAuth()
 
   if (authLoading) {
     return (
@@ -61,7 +61,7 @@ export const Home = () => {
             onImportEvents={importEvents}
           />
         ) : (
-          <LoginSection onLogin={login} />
+          <LoginSection onLogin={login} onForgotPassword={forgotPassword} />
         )}
       </main>
 
