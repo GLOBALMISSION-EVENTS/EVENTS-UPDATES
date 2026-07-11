@@ -35,7 +35,7 @@ const INITIAL_EVENTS: Omit<Event, 'id'>[] = [
 export const useEvents = () => {
   const queryClient = useQueryClient()
 
-  const { data: events = [], isLoading } = useQuery({
+  const { data: events = [], isLoading, error } = useQuery({
     queryKey: ['events'],
     queryFn: async () => {
       const { data, error } = await supabase
@@ -49,8 +49,15 @@ export const useEvents = () => {
       }
 
       if (!data || data.length === 0) {
+        const errors: string[] = []
         for (const event of INITIAL_EVENTS) {
-          await supabase.from('events').insert(event)
+          const { error: insertError } = await supabase.from('events').insert(event)
+          if (insertError) {
+            errors.push(insertError.message)
+          }
+        }
+        if (errors.length > 0) {
+          console.error('Error seeding events:', errors.join(', '))
         }
         const { data: seeded } = await supabase
           .from('events')
@@ -179,6 +186,7 @@ export const useEvents = () => {
   return {
     events,
     isLoading,
+    error,
     addEvent,
     updateEvent,
     deleteEvent,

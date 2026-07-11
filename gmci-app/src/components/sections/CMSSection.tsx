@@ -799,7 +799,7 @@ const AboutTab = ({ content, onUpdateContent }: AboutTabProps) => {
 }
 
 const QRCodeTab = () => {
-  const [url, setUrl] = useState('https://globalmissionevents.github.io/EVENTS-UPDATES/')
+  const [url, setUrl] = useState('https://globalmission-events.github.io/EVENTS-UPDATES/')
   const [size, setSize] = useState(256)
   const canvasRef = useRef<HTMLCanvasElement>(null)
 

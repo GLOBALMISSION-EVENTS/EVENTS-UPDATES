@@ -78,14 +78,26 @@ CREATE POLICY "Enable delete for authenticated users only" ON events
   FOR DELETE USING (auth.role() = 'authenticated');
 ```
 
-### 3. Configure Supabase Client
+### 3. Seed Initial Events (Recommended)
+
+After creating the table, run this SQL in the Supabase SQL Editor to populate initial events. This is **required** because the app's client-side seeding cannot insert data with the anonymous key under the default RLS policies.
+
+```sql
+INSERT INTO events (position, title, date, venue, description, type, image)
+VALUES
+  (1, 'Mission Impact Breakfast', '10th July 2026 - 9AM', 'Y.M.C.A. Hall - Nyeri Town', 'Join us for a morning of fellowship, prayer, and inspiration as we unite in fundraising for the Great August Harvest, 5th Annual Mega Conference & Medical Camp. Breakfast will be served. Come Hungry - Leave Inspired. Blessed are those who hunger and thirst for righteousness, for they shall be filled. Mat 5:6 (NIV)', 'upcoming', '/images/breakfast-poster.png'),
+  (2, '5th Annual Mega Conference & Free Medical Camp', '9-16th August 2026 from 9AM', 'Kiamariga Nursery Grounds', 'Theme: Healing the Land - Amos 9:14 From Exile to Divine Restoration. All Are Welcome! Featuring: Rev. Anthony Waithaka (Director - GMCI), Archbishop Simon Githiga (Elim Pentecostal Kenya), Bishop Moses Mbugua (Redeemed Gospel Church Thika), Apostle Anthony Ngumo (Reigners Chapel), Rev. James Nyaga (Excellent Glory Center), Bishop Dr. Margaret Wangare (Anointed Christian Fellowship Banana).', 'upcoming', '/images/about-us.png'),
+  (3, 'Conference & Medical Camp @ Kiamariga', '9th -16th August 2026', 'Kiamariga', 'Our 5th Annual Conference & Medical Camp', 'upcoming', '/images/kiamariga-camp.jpg');
+```
+
+### 4. Configure Supabase Client
 Update `gmci-app/src/lib/supabase.ts` with your project credentials:
 ```typescript
 const SUPABASE_URL = 'YOUR_SUPABASE_URL'
 const SUPABASE_ANON_KEY = 'YOUR_SUPABASE_ANON_KEY'
 ```
 
-### 4. Set Up Authentication
+### 5. Set Up Authentication
 - In your Supabase project, go to Authentication → Users
 - Add a new user (email and password) for admin login
 

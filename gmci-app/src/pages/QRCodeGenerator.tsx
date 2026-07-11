@@ -9,7 +9,7 @@ import { Link } from 'react-router-dom'
 import { useAuth } from '@/hooks/useAuth'
 
 export const QRCodeGenerator = () => {
-  const [url, setUrl] = useState('https://globalmissionevents.github.io/EVENTS-UPDATES/')
+  const [url, setUrl] = useState('https://globalmission-events.github.io/EVENTS-UPDATES/')
   const [size, setSize] = useState(1024)
   const canvasRef = useRef<HTMLCanvasElement>(null)
   const { isLoggedIn, logout } = useAuth()

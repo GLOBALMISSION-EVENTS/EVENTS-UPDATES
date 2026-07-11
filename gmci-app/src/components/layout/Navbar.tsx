@@ -19,8 +19,9 @@ export const Navbar = ({ isLoggedIn = false, onLogout }: NavbarProps) => {
     { id: 'about', label: 'About Us', href: '#about' },
   ]
 
+  navItems.push({ id: 'admin', label: 'Admin', href: '/admin' })
+
   if (isLoggedIn) {
-    navItems.push({ id: 'cms', label: 'CMS Admin', href: '#cms' })
     navItems.push({ id: 'qrcode', label: 'QR Generator', href: '/qrcode' })
   }
 

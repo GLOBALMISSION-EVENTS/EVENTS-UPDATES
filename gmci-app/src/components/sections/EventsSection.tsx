@@ -9,7 +9,9 @@ interface EventsSectionProps {
 export const EventsSection = ({ events }: EventsSectionProps) => {
   const [activeTab, setActiveTab] = useState<'upcoming' | 'recent'>('upcoming')
 
-  const filteredEvents = events.filter((event) => event.type === activeTab)
+  const filteredEvents = events.filter(
+    (event) => event.type?.toLowerCase() === activeTab
+  )
 
   return (
     <section id="events" className="py-20 bg-light-bg">

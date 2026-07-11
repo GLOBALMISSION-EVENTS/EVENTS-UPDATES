@@ -4,10 +4,7 @@ import { Footer } from '@/components/layout/Footer'
 import { HeroCarousel } from '@/components/sections/HeroCarousel'
 import { EventsSection } from '@/components/sections/EventsSection'
 import { AboutSection } from '@/components/sections/AboutSection'
-import { CMSSection } from '@/components/sections/CMSSection'
-import { LoginSection } from '@/components/sections/LoginSection'
 import { useEvents } from '@/hooks/useEvents'
-import { useAuth } from '@/hooks/useAuth'
 import { useHeroSlides } from '@/hooks/useHeroSlides'
 import { useAboutContent } from '@/hooks/useAboutContent'
 import type { AboutContent } from '@/types'
@@ -16,34 +13,18 @@ export const Home = () => {
   const {
     events,
     isLoading: eventsLoading,
-    addEvent,
-    updateEvent,
-    deleteEvent,
-    reorderEvents,
-    resetEvents,
-    exportEvents,
-    importEvents,
+    error: eventsError,
   } = useEvents()
 
-  const { slides, addSlide, updateSlide, deleteSlide, reorderSlides } = useHeroSlides()
+  const { slides } = useHeroSlides()
 
-  const { content: aboutContent, updateContent } = useAboutContent()
+  const { content: aboutContent } = useAboutContent()
   const cmsAboutContent: AboutContent | null = aboutContent ?? null
-
-  const { isLoggedIn, isLoading: authLoading, login, forgotPassword, logout } = useAuth()
-
-  if (authLoading) {
-    return (
-      <div className="min-h-screen flex items-center justify-center">
-        <p className="text-xl text-text-light">Loading...</p>
-      </div>
-    )
-  }
 
   return (
     <div className="min-h-screen">
       <header id="home" className="relative bg-dark">
-        <Navbar isLoggedIn={isLoggedIn} onLogout={logout} />
+        <Navbar />
         <HeroCarousel slides={slides} />
       </header>
 
@@ -52,32 +33,20 @@ export const Home = () => {
           <div className="py-20 text-center">
             <p className="text-xl text-text-light">Loading events...</p>
           </div>
+        ) : eventsError ? (
+          <section id="events" className="py-20 bg-light-bg">
+            <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+              <h2 className="text-4xl md:text-5xl font-bold text-center text-text-dark mb-12">Events</h2>
+              <div className="bg-red-50 border border-red-200 text-red-700 px-6 py-4 rounded-lg max-w-xl mx-auto">
+                <p className="font-semibold mb-1">Failed to load events</p>
+                <p className="text-sm">{eventsError?.message || 'Check the browser console for details.'}</p>
+              </div>
+            </div>
+          </section>
         ) : (
           <EventsSection events={events} />
         )}
         <AboutSection content={cmsAboutContent} />
-        
-        {isLoggedIn ? (
-          <CMSSection
-            events={events}
-            onAddEvent={addEvent}
-            onUpdateEvent={updateEvent}
-            onDeleteEvent={deleteEvent}
-            onReorderEvents={reorderEvents}
-            onResetEvents={resetEvents}
-            onExportEvents={exportEvents}
-            onImportEvents={importEvents}
-            heroSlides={slides}
-            onAddSlide={addSlide}
-            onUpdateSlide={updateSlide}
-            onDeleteSlide={deleteSlide}
-            onReorderSlides={reorderSlides}
-            aboutContent={cmsAboutContent}
-            onUpdateAboutContent={updateContent}
-          />
-        ) : (
-          <LoginSection onLogin={login} onForgotPassword={forgotPassword} />
-        )}
       </main>
 
       <Footer />
