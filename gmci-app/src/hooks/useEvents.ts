@@ -66,35 +66,54 @@ export const useEvents = () => {
           .from('events')
           .select('*')
           .order('position', { ascending: true })
-        return autoCategorizeEvents((seeded || []) as Event[])
+        return await autoCategorizeEvents((seeded || []) as Event[])
       }
 
-      return autoCategorizeEvents(data as Event[])
+      return await autoCategorizeEvents(data as Event[])
     },
+    // Refetch every 5 minutes to catch date changes (useful for overnight/weekend changes)
+    refetchInterval: 5 * 60 * 1000, // 5 minutes
+    // Always refetch when window regains focus to catch date changes
+    refetchOnWindowFocus: true,
   })
 
   const autoCategorizeEvents = async (events: Event[]): Promise<Event[]> => {
     const today = new Date().toISOString().split('T')[0]
-    const updated: Event[] = []
+    const updatedEvents: Event[] = []
+    const eventsToUpdate: { id: number; type: 'recent' }[] = []
 
+    // First pass: identify events that need updating and prepare the updated array
     for (const event of events) {
       if (event.event_date && event.event_date < today && event.type === 'upcoming') {
-        const { error } = await supabase
-          .from('events')
-          .update({ type: 'recent' })
-          .eq('id', event.id)
-        if (error) {
-          console.error('Error auto-categorizing event:', error)
-          updated.push(event)
-        } else {
-          updated.push({ ...event, type: 'recent' })
-        }
+        // This event should be marked as recent
+        eventsToUpdate.push({ id: event.id, type: 'recent' })
+        updatedEvents.push({ ...event, type: 'recent' })
       } else {
-        updated.push(event)
+        // Keep event as-is
+        updatedEvents.push(event)
       }
     }
 
-    return updated
+    // Batch update all events that need to be changed
+    if (eventsToUpdate.length > 0) {
+      try {
+        for (const update of eventsToUpdate) {
+          const { error } = await supabase
+            .from('events')
+            .update({ type: update.type })
+            .eq('id', update.id)
+          
+          if (error) {
+            console.error(`Error auto-categorizing event ${update.id}:`, error)
+          }
+        }
+        console.log(`Auto-categorized ${eventsToUpdate.length} events from upcoming to recent`)
+      } catch (error) {
+        console.error('Error during batch auto-categorization:', error)
+      }
+    }
+
+    return updatedEvents
   }
 
   const addEventMutation = useMutation({
