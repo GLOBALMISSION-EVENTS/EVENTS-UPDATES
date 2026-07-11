@@ -52,6 +52,8 @@ export const Navbar = ({ isLoggedIn = false, onLogout }: NavbarProps) => {
                 src={getImageUrl('/images/GLOBAL LOGO.png')}
                 alt="GMCI Logo"
                 className="h-12 w-12 object-contain"
+                width="48"
+                height="48"
               />
             </Link>
             <span className="text-xl font-bold text-white hidden sm:block">

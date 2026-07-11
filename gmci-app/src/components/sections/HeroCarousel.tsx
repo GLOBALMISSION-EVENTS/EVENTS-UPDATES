@@ -30,28 +30,46 @@ export const HeroCarousel = ({ slides = [] }: HeroCarouselProps) => {
     return () => clearInterval(interval)
   }, [nextSlide])
 
+  const getSlideIndex = (offset: number) =>
+    (currentSlide + offset + slideCount) % slideCount
+
+  const shouldRender = (index: number) => {
+    return (
+      index === currentSlide ||
+      index === getSlideIndex(1) ||
+      index === getSlideIndex(-1)
+    )
+  }
+
   return (
     <div className="relative w-full h-screen overflow-hidden">
       {slides.map((slide, index) => (
         <div
           key={slide.id}
           className={`absolute inset-0 transition-opacity duration-[2500ms] ease-in-out ${
-            index === currentSlide ? 'opacity-100' : 'opacity-0'
+            index === currentSlide ? 'opacity-100 z-10' : 'opacity-0 z-0'
           }`}
         >
-          <div
-            className="absolute -inset-[10%] w-[120%] h-[120%] bg-cover bg-center blur-[25px] z-0 opacity-40 animate-slow-pan"
-            style={{ backgroundImage: `url(${getImageUrl(slide.image)})` }}
-          />
-          <img
-            src={getImageUrl(slide.image)}
-            alt={slide.alt}
-            className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-full h-full object-cover z-10 opacity-95"
-            style={{
-              filter: 'drop-shadow(0 20px 30px rgba(0,0,0,0.6))',
-            }}
-          />
-          <div className="absolute inset-0 bg-gradient-to-b from-dark/90 via-dark/60 to-dark/95 z-20 pointer-events-none" />
+          {shouldRender(index) && (
+            <>
+              <div
+                className="absolute -inset-[10%] w-[120%] h-[120%] bg-cover bg-center blur-[25px] z-0 opacity-40 animate-slow-pan"
+                style={{ backgroundImage: `url(${getImageUrl(slide.image)})` }}
+              />
+              <img
+                src={getImageUrl(slide.image)}
+                alt={slide.alt}
+                className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-full h-full object-cover z-10 opacity-95"
+                style={{
+                  filter: 'drop-shadow(0 20px 30px rgba(0,0,0,0.6))',
+                }}
+                loading={index === currentSlide ? 'eager' : 'lazy'}
+                width="1920"
+                height="1080"
+              />
+              <div className="absolute inset-0 bg-gradient-to-b from-dark/90 via-dark/60 to-dark/95 z-20 pointer-events-none" />
+            </>
+          )}
         </div>
       ))}
 

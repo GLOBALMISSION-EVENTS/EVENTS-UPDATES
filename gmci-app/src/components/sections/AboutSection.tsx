@@ -51,6 +51,9 @@ export const AboutSection = ({ content }: AboutSectionProps) => {
                 src={getImageUrl(c.aboutImage || '/images/about-us.png')}
                 alt="Global Mission For Christ International"
                 className="w-full rounded-2xl shadow-xl"
+                loading="lazy"
+                width="1200"
+                height="675"
               />
             </div>
 
@@ -82,6 +85,9 @@ export const AboutSection = ({ content }: AboutSectionProps) => {
                   src={getImageUrl(c.directorImage || '/images/DIRECTOR.png')}
                   alt={c.directorName}
                   className="w-24 h-24 rounded-full object-cover"
+                  loading="lazy"
+                  width="96"
+                  height="96"
                 />
                 <div>
                   <h3 className="text-2xl font-bold text-text-dark">Director&apos;s Message</h3>
