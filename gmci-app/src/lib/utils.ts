@@ -6,7 +6,7 @@ export function cn(...inputs: ClassValue[]) {
 }
 
 export function getImageUrl(path: string) {
-  const base = import.meta.env.BASE_URL || '/'
+  const base = (import.meta as any).env?.BASE_URL || '/'
   const normalizedPath = path.startsWith('/') ? path.slice(1) : path
   return `${base}${normalizedPath}`
 }
