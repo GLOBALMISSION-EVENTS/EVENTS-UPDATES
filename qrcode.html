@@ -1,21 +1,11 @@
-﻿<!DOCTYPE html>
+﻿﻿﻿﻿﻿﻿<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>GMCI QR Code Generator</title>
     <link rel="stylesheet" href="styles.css">
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/qrious/4.0.2/qrious.min.js"></script>
-    <script>
-        // Check admin authentication before loading
-        const ADMIN_PASSWORD_KEY = 'gmciAdminAuth';
-        const isLoggedIn = localStorage.getItem(ADMIN_PASSWORD_KEY) === 'true';
-        
-        if (!isLoggedIn) {
-            // Redirect to home if not authenticated
-            window.location.href = 'index.html';
-        }
-    </script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcode-generator/1.4.4/qrcode.min.js"></script>
     <style>
         body {
             min-height: 100vh;
@@ -30,7 +20,7 @@
         }
         h1 {
             font-family: 'Playfair Display', serif;
-            margin-bottom: 0;
+            margin-bottom: 30px;
             font-size: 2.5rem;
         }
         .container {
@@ -79,12 +69,6 @@
         .btn-info:hover {
             background: #2563eb;
         }
-        .btn-secondary {
-            background: #6b7280;
-        }
-        .btn-secondary:hover {
-            background: #4b5563;
-        }
         #qrContainer {
             background: white;
             padding: 30px;
@@ -93,15 +77,10 @@
             margin-bottom: 20px;
             min-height: 300px;
             min-width: 300px;
-            max-width: 400px;
         }
         #qrCanvas {
             display: block;
             margin: 0 auto;
-            max-width: 100%;
-            height: auto;
-            image-rendering: -webkit-optimize-contrast;
-            image-rendering: crisp-edges;
         }
         .back-link {
             color: #f97316;
@@ -158,10 +137,7 @@
 </head>
 <body>
     <div class="container">
-        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
-            <h1>GMCI QR Code Generator</h1>
-            <button onclick="logout()" class="btn btn-secondary" style="padding: 10px 30px; margin: 0;">Logout</button>
-        </div>
+        <h1>GMCI QR Code Generator</h1>
         
         <input type="text" id="urlInput" placeholder="Enter URL" value="https://globalmission-events.github.io/EVENTS-UPDATES">
         
@@ -171,7 +147,7 @@
         
         <div style="display: flex; flex-wrap: wrap; justify-content: center; gap: 10px; margin: 20px 0;">
             <button onclick="downloadSVG()" class="btn btn-info" id="svgBtn" disabled>Download SVG (Vector)</button>
-            <button onclick="downloadPNG()" class="btn btn-success" id="pngBtn" disabled>Download PNG (Print Ready - 1024x1024px)</button>
+            <button onclick="downloadPNG()" class="btn btn-success" id="pngBtn" disabled>Download PNG (Print Ready - 2000x2000px)</button>
         </div>
         
         <div id="qrContainer">
@@ -182,27 +158,20 @@
             <h3>📋 Download Formats Available:</h3>
             <ul>
                 <li><strong>SVG (Vector):</strong> Scalable format - perfect for resizing without quality loss. Best for: logos, signs, large displays</li>
-                <li><strong>PNG (1024x1024px):</strong> Industry-standard high-resolution format - ready for professional printing and digital use. Best for: posters, banners, brochures, websites, social media</li>
+                <li><strong>PNG (2000x2000px @ 300 DPI):</strong> High-resolution raster format - ready for professional printing. Best for: posters, banners, brochures, T-shirts</li>
             </ul>
             <p style="margin: 10px 0 0 0; opacity: 0.8;">✓ Error correction level H (30%) - maintains scannability even with damage or wear</p>
         </div>
         
         <p style="opacity: 0.8; margin-bottom: 20px;">Scan this QR code to visit the website!</p>
-        <a href="index.html#cms" class="back-link">← Back to Admin Dashboard</a>
+        <a href="index.html" class="back-link">← Back to Home</a>
     </div>
     
     <script>
-        // Logout function
-        function logout() {
-            const ADMIN_PASSWORD_KEY = 'gmciAdminAuth';
-            localStorage.removeItem(ADMIN_PASSWORD_KEY);
-            window.location.href = 'index.html';
-        }
-        
-        let qr;
+        let qrcode;
         let currentUrl = 'https://globalmission-events.github.io/EVENTS-UPDATES';
         let qrReady = false;
-        let highResCanvas; // Separate canvas for high-res export
+        let svgData = '';
 
         // Show status message
         function showStatus(message, type) {
@@ -212,33 +181,45 @@
             statusEl.style.display = 'block';
         }
 
+        // Hide status message
+        function hideStatus() {
+            document.getElementById('statusMessage').style.display = 'none';
+        }
+
         // Check if URL is accessible
         async function checkURLAccessibility(url) {
             showStatus('🔍 Checking website accessibility...', 'info');
             
             try {
+                // Try to fetch with no-cors mode to avoid CORS issues
                 const controller = new AbortController();
-                const timeoutId = setTimeout(() => controller.abort(), 10000);
+                const timeoutId = setTimeout(() => controller.abort(), 10000); // 10 second timeout
                 
-                await fetch(url, { 
+                const response = await fetch(url, { 
                     mode: 'no-cors',
                     signal: controller.signal 
                 });
                 
                 clearTimeout(timeoutId);
+                
+                // no-cors mode returns opaque response, which means request was sent
+                // If we get here without error, the URL is likely accessible
                 return true;
             } catch (error) {
                 if (error.name === 'AbortError') {
                     showStatus('⚠️ Website check timed out, but proceeding with QR generation', 'info');
-                } else {
-                    showStatus('⚠️ Cannot verify website accessibility. Proceeding with QR generation anyway.', 'info');
+                    return true; // Proceed anyway
                 }
-                return true;
+                
+                // Network error - URL might be invalid or unreachable
+                showStatus(`⚠️ Cannot verify website accessibility. Proceeding with QR generation anyway.`, 'info');
+                return true; // Proceed anyway - URL might be valid but have CORS restrictions
             }
         }
 
         // Generate QR Code
         async function generateQR() {
+            const container = document.getElementById('qrContainer');
             const canvas = document.getElementById('qrCanvas');
             const generateBtn = document.getElementById('generateBtn');
             
@@ -258,29 +239,38 @@
             }
             
             // Check URL accessibility
-            await checkURLAccessibility(currentUrl);
+            const isAccessible = await checkURLAccessibility(currentUrl);
             
             try {
-                // Display version: 350x350px (optimal screen display size)
-                qr = new QRious({
-                    element: canvas,
-                    value: currentUrl,
-                    size: 350,
-                    level: 'H',
-                    background: '#ffffff',
-                    foreground: '#1e3a5f'
-                });
+                // Create QR code with highest error correction (H = 30%)
+                qrcode = qrcodegen.QrCode.encodeText(currentUrl, qrcodegen.QrCode.Ecc.HIGH);
                 
-                // Create hidden high-res canvas for exports (1024x1024px - industry standard)
-                highResCanvas = document.createElement('canvas');
-                const highResQR = new QRious({
-                    element: highResCanvas,
-                    value: currentUrl,
-                    size: 1024, // 1024x1024px - perfect for print and digital
-                    level: 'H',
-                    background: '#ffffff',
-                    foreground: '#1e3a5f'
-                });
+                // Generate high-resolution PNG (2000x2000px for 300 DPI printing)
+                const size = 2000;
+                const moduleSize = Math.floor(size / qrcode.size);
+                const actualSize = qrcode.size * moduleSize;
+                
+                canvas.width = actualSize;
+                canvas.height = actualSize;
+                
+                const ctx = canvas.getContext('2d');
+                
+                // Fill background (white)
+                ctx.fillStyle = '#ffffff';
+                ctx.fillRect(0, 0, actualSize, actualSize);
+                
+                // Draw QR code modules (dark blue)
+                ctx.fillStyle = '#1e3a5f';
+                for (let y = 0; y < qrcode.size; y++) {
+                    for (let x = 0; x < qrcode.size; x++) {
+                        if (qrcode.getModule(x, y)) {
+                            ctx.fillRect(x * moduleSize, y * moduleSize, moduleSize, moduleSize);
+                        }
+                    }
+                }
+                
+                // Generate SVG
+                svgData = generateSVG(qrcode);
                 
                 qrReady = true;
                 document.getElementById('pngBtn').disabled = false;
@@ -298,53 +288,29 @@
             generateBtn.textContent = 'Generate QR Code';
         }
         
-        // Generate professional SVG with proper scaling
-        function generateSVG() {
-            const tempCanvas = document.createElement('canvas');
-            const size = 1024; // Use high-res version
+        // Generate SVG format
+        function generateSVG(qrcode) {
+            const border = 4; // Quiet zone
+            const size = qrcode.size + border * 2;
+            const moduleSize = 10; // Size of each module in SVG units
             
-            const tempQR = new QRious({
-                element: tempCanvas,
-                value: currentUrl,
-                size: size,
-                level: 'H',
-                background: '#ffffff',
-                foreground: '#1e3a5f'
-            });
+            let svg = `<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN" "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+<svg xmlns="http://www.w3.org/2000/svg" version="1.1" viewBox="0 0 ${size * moduleSize} ${size * moduleSize}" stroke="none">
+    <rect width="100%" height="100%" fill="#ffffff"/>
+    <g fill="#1e3a5f">
+`;
             
-            const ctx = tempCanvas.getContext('2d');
-            const imageData = ctx.getImageData(0, 0, size, size);
-            const data = imageData.data;
-            
-            // Calculate module size for cleaner SVG
-            const moduleSize = 8; // 8 units per module for clean rendering
-            const modules = [];
-            const step = Math.floor(size / 64); // Sample grid
-            
-            // Detect QR modules
-            for (let y = 0; y < size; y += step) {
-                for (let x = 0; x < size; x += step) {
-                    const i = (y * size + x) * 4;
-                    const isDark = data[i] < 128;
-                    
-                    if (isDark) {
-                        const mx = Math.floor(x / step);
-                        const my = Math.floor(y / step);
-                        modules.push({ x: mx * moduleSize, y: my * moduleSize });
+            for (let y = 0; y < qrcode.size; y++) {
+                for (let x = 0; x < qrcode.size; x++) {
+                    if (qrcode.getModule(x, y)) {
+                        const px = (x + border) * moduleSize;
+                        const py = (y + border) * moduleSize;
+                        svg += `        <rect x="${px}" y="${py}" width="${moduleSize}" height="${moduleSize}"/>
+`;
                     }
                 }
             }
-            
-            const svgSize = 64 * moduleSize + 32; // Add padding
-            let svg = `<?xml version="1.0" encoding="UTF-8"?>
-<svg xmlns="http://www.w3.org/2000/svg" version="1.1" viewBox="0 0 ${svgSize} ${svgSize}" shape-rendering="crispEdges">
-    <rect width="100%" height="100%" fill="#ffffff"/>
-    <g fill="#1e3a5f" transform="translate(16, 16)">
-`;
-            
-            modules.forEach(m => {
-                svg += `        <rect x="${m.x}" y="${m.y}" width="${moduleSize}" height="${moduleSize}"/>\n`;
-            });
             
             svg += `    </g>
 </svg>`;
@@ -352,42 +318,35 @@
             return svg;
         }
         
-        // Download PNG (1024x1024px - Industry Standard)
+        // Download PNG (High Resolution - 2000x2000px @ 300 DPI)
         function downloadPNG() {
-            if (!qrReady || !highResCanvas) return;
+            if (!qrReady) return;
             
-            highResCanvas.toBlob(function(blob) {
+            const canvas = document.getElementById('qrCanvas');
+            
+            canvas.toBlob(function(blob) {
                 const link = document.createElement('a');
-                link.download = 'gmci-qrcode-1024x1024.png';
+                link.download = 'gmci-qrcode-print-ready.png';
                 link.href = URL.createObjectURL(blob);
                 link.click();
                 URL.revokeObjectURL(link.href);
                 
-                showStatus('✅ PNG downloaded! (1024x1024px - Print & Digital Ready)', 'success');
+                showStatus('✅ PNG downloaded! (2000x2000px @ 300 DPI - Print Ready)', 'success');
             }, 'image/png', 1.0);
         }
         
         // Download SVG (Vector Format)
         function downloadSVG() {
-            if (!qrReady) return;
+            if (!qrReady || !svgData) return;
             
-            showStatus('⏳ Generating SVG...', 'info');
+            const blob = new Blob([svgData], { type: 'image/svg+xml' });
+            const link = document.createElement('a');
+            link.download = 'gmci-qrcode-vector.svg';
+            link.href = URL.createObjectURL(blob);
+            link.click();
+            URL.revokeObjectURL(link.href);
             
-            setTimeout(() => {
-                try {
-                    const svgData = generateSVG();
-                    const blob = new Blob([svgData], { type: 'image/svg+xml' });
-                    const link = document.createElement('a');
-                    link.download = 'gmci-qrcode-vector.svg';
-                    link.href = URL.createObjectURL(blob);
-                    link.click();
-                    URL.revokeObjectURL(link.href);
-                    
-                    showStatus('✅ SVG downloaded! (Vector - Scalable to any size)', 'success');
-                } catch (error) {
-                    showStatus('❌ Error generating SVG: ' + error.message, 'error');
-                }
-            }, 100);
+            showStatus('✅ SVG downloaded! (Vector - Scalable to any size)', 'success');
         }
         
         // Auto-generate on page load

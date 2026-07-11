@@ -1,0 +1,60 @@
+🚀 SUPABASE SETUP - QUICK CHECKLIST
+=====================================
+
+Complete these steps, then I'll write all the integration code for you!
+
+☐ STEP 1: Create Account (2 min)
+   → Go to: https://supabase.com
+   → Click "Start your project"
+   → Sign in with GitHub
+
+☐ STEP 2: Create Project (3 min)
+   → Click "New Project"
+   → Name: gmci-events
+   → Password: [Generate & Save!]
+   → Region: ap-southeast-1 (Singapore)
+   → Plan: Free
+   → Click "Create new project"
+   → ⏰ Wait 2-3 minutes
+
+☐ STEP 3: Copy API Keys (1 min)
+   → Go to Settings → API
+   → Copy "Project URL"
+   → Copy "anon public" key
+   → Paste both into supabase-config.js
+
+☐ STEP 4: Create Database Table (5 min)
+   → Go to SQL Editor
+   → Click "New query"
+   → Copy SQL from SUPABASE_SETUP_GUIDE.md (Step 4)
+   → Click "Run"
+   → Should see: ✅ Success
+
+☐ STEP 5: Create Admin User (2 min)
+   → Go to Authentication → Users
+   → Click "Add user"
+   → Email: your-email@example.com
+   → Password: [Strong password & Save!]
+   → ✅ Auto Confirm User: checked
+   → Click "Create user"
+
+=====================================
+
+✅ DONE? Tell me and I'll integrate everything into your code!
+
+You'll get:
+- Real authentication (no more localStorage hacks)
+- Cloud database (no more 5MB limit)
+- Row-level security
+- Multi-device sync
+- Automatic backups
+
+All for FREE!
+
+=====================================
+
+⏱️ Total Time: ~15 minutes
+💰 Cost: $0 (Free forever for your usage)
+🎯 Result: Production-grade security
+
+=====================================

@@ -28,8 +28,13 @@ const initialEvents = [
     }
 ];
 
-// Load events: Initialize from Supabase
-let events = [];
+// Load events: use initial events if localStorage is missing images
+const storedEvents = JSON.parse(localStorage.getItem('gmci_events'));
+let events = storedEvents;
+if (!events || !events[0] || !events[0].image) {
+    events = initialEvents;
+    saveToStorage();
+}
 let currentTab = 'upcoming';
 let sortable = null;
 
@@ -39,44 +44,30 @@ let slideInterval;
 // Smooth scroll and touch optimizations
 document.documentElement.style.scrollBehavior = 'smooth';
 
-document.addEventListener('DOMContentLoaded', async function() {
+// Authentication configuration
+const ADMIN_PASSWORD_KEY = 'gmci_admin_logged_in';
+const ADMIN_PASSWORD = 'gmci2026'; // You should change this to your own secure password!
+
+document.addEventListener('DOMContentLoaded', function() {
     // Auto-update copyright year
     document.getElementById('copyright-year').textContent = new Date().getFullYear();
     
-    // Wait for Supabase to be ready
-    const supabaseReady = await window.waitForSupabase();
-    
-    if (!supabaseReady) {
-        console.error('Failed to initialize Supabase');
-        alert('Failed to connect to database. Please refresh the page.');
-        return;
-    }
-    
-    // Initialize Supabase modules
-    await window.supabaseAuth.init();
-    window.supabaseEvents.init();
-    
-    // Load events from Supabase
-    const result = await window.supabaseEvents.fetchAll();
-    if (result.success) {
-        events = result.events;
-    }
-    
-    // Check authentication status
+    // Check authentication status on load
     checkAuthStatus();
     
     // Initialize carousel
     initCarousel();
     
     renderEvents();
+    // Don't render CMS unless authenticated
     initSortable();
     initEventListeners();
     initAuthListeners();
 });
 
 // Authentication functions
-async function checkAuthStatus() {
-    const isLoggedIn = window.supabaseAuth.isAuthenticated();
+function checkAuthStatus() {
+    const isLoggedIn = localStorage.getItem(ADMIN_PASSWORD_KEY) === 'true';
     if (isLoggedIn) {
         showCMS();
     } else {
@@ -88,7 +79,6 @@ function showCMS() {
     document.getElementById('adminLogin').style.display = 'none';
     document.getElementById('cms').style.display = 'block';
     document.getElementById('adminNav').style.display = 'block';
-    document.getElementById('qrNav').style.display = 'block';
     renderCMS();
 }
 
@@ -96,49 +86,37 @@ function showLogin() {
     document.getElementById('adminLogin').style.display = 'block';
     document.getElementById('cms').style.display = 'none';
     document.getElementById('adminNav').style.display = 'none';
-    document.getElementById('qrNav').style.display = 'none';
     document.getElementById('loginError').style.display = 'none';
 }
 
-async function login(email, password) {
-    const result = await window.supabaseAuth.login(email, password);
-    
-    if (result.success) {
+function login(password) {
+    if (password === ADMIN_PASSWORD) {
+        localStorage.setItem(ADMIN_PASSWORD_KEY, 'true');
         showCMS();
         return true;
-    } else {
-        document.getElementById('loginError').textContent = result.error || 'Login failed. Please try again.';
-        document.getElementById('loginError').style.display = 'block';
-        return false;
     }
+    return false;
 }
 
-async function logout() {
-    await window.supabaseAuth.logout();
+function logout() {
+    localStorage.removeItem(ADMIN_PASSWORD_KEY);
     showLogin();
-    location.reload();
 }
 
 function initAuthListeners() {
     // Login form submit
-    document.getElementById('loginForm').addEventListener('submit', async function(e) {
+    document.getElementById('loginForm').addEventListener('submit', function(e) {
         e.preventDefault();
-        const email = document.getElementById('adminEmail').value;
         const password = document.getElementById('adminPassword').value;
-        await login(email, password);
+        if (login(password)) {
+            document.getElementById('adminPassword').value = '';
+        } else {
+            document.getElementById('loginError').style.display = 'block';
+        }
     });
 
     // Logout button
     document.getElementById('logoutBtn').addEventListener('click', logout);
-    
-    // Listen to auth state changes
-    window.supabaseAuth.onAuthStateChange((event, session) => {
-        if (event === 'SIGNED_OUT') {
-            showLogin();
-        } else if (event === 'SIGNED_IN') {
-            showCMS();
-        }
-    });
 }
 
 function initCarousel() {
@@ -206,15 +184,15 @@ function stopAutoPlay() {
 
 function renderEvents() {
     const grid = document.getElementById('eventsGrid');
-    const filteredEvents = window.supabaseEvents.getByType(currentTab);
+    const filteredEvents = events.filter(e => e.type === currentTab);
     
     grid.innerHTML = filteredEvents.map(event => `
         <div class="event-card">
             <div class="event-card-image">
-                ${event.image 
-                    ? `<img src="${event.image}" alt="${event.title}" class="event-card-img" loading="lazy">` 
-                    : '✝️'}
-            </div>
+                                ${event.image 
+                                    ? `<img src="${event.image}" alt="${event.title}" class="event-card-img" loading="lazy">` 
+                                    : '✝️'}
+                            </div>
             <div class="event-card-content">
                 <h3 class="event-card-title">${event.title}</h3>
                 <p class="event-card-date">📅 ${event.date}</p>
@@ -225,11 +203,10 @@ function renderEvents() {
     `).join('');
 }
 
-async function renderCMS() {
+function renderCMS() {
     const grid = document.getElementById('cmsGrid');
-    const allEvents = window.supabaseEvents.events;
     
-    grid.innerHTML = allEvents.map(event => `
+    grid.innerHTML = events.map(event => `
         <div class="cms-card" data-id="${event.id}">
             <div class="cms-card-header">
                 <div class="cms-card-title">${event.title}</div>
@@ -254,14 +231,10 @@ function initSortable() {
     sortable = new Sortable(grid, {
         animation: 150,
         ghostClass: 'dragging',
-        onEnd: async function(evt) {
-            // Get new order of IDs
-            const orderedIds = Array.from(grid.children).map(card => 
-                parseInt(card.getAttribute('data-id'))
-            );
-            
-            // Update order in database
-            await window.supabaseEvents.updateOrder(orderedIds);
+        onEnd: function(evt) {
+            const item = events.splice(evt.oldIndex, 1)[0];
+            events.splice(evt.newIndex, 0, item);
+            saveToStorage();
             renderEvents();
         }
     });
@@ -279,36 +252,24 @@ function initEventListeners() {
     
     document.getElementById('addEventBtn').addEventListener('click', () => openModal());
     
-    document.getElementById('saveDataBtn').addEventListener('click', async () => {
-        // Data is automatically saved to Supabase on each operation
-        alert('All changes are automatically saved to the database!');
+    document.getElementById('saveDataBtn').addEventListener('click', () => {
+        saveToStorage();
+        alert('Data saved successfully!');
     });
     
-    document.getElementById('exportDataBtn').addEventListener('click', async () => {
-        const dataStr = window.supabaseEvents.exportData();
-        const blob = new Blob([dataStr], { type: 'application/json' });
-        const url = URL.createObjectURL(blob);
-        const a = document.createElement('a');
-        a.href = url;
-        a.download = 'gmci-events-backup.json';
-        a.click();
-        URL.revokeObjectURL(url);
-    });
+    document.getElementById('exportDataBtn').addEventListener('click', exportData);
     
     document.getElementById('importDataBtn').addEventListener('click', () => {
         document.getElementById('importFile').click();
     });
     
-    document.getElementById('resetEventsBtn').addEventListener('click', async () => {
-        if (confirm('Are you sure you want to reset all events to default? This cannot be undone!')) {
-            const result = await window.supabaseEvents.importData(initialEvents);
-            if (result.success) {
-                renderEvents();
-                renderCMS();
-                alert('Events reset to default successfully!');
-            } else {
-                alert('Error resetting events: ' + result.error);
-            }
+    document.getElementById('resetEventsBtn').addEventListener('click', () => {
+        if (confirm('Are you sure you want to reset all events to default?')) {
+            events = initialEvents;
+            saveToStorage();
+            renderEvents();
+            renderCMS();
+            alert('Events reset to default successfully!');
         }
     });
     
@@ -317,38 +278,16 @@ function initEventListeners() {
     document.getElementById('modalClose').addEventListener('click', closeModal);
     document.getElementById('cancelBtn').addEventListener('click', closeModal);
     
-    // File upload listener with validation
+    // File upload listener
     document.getElementById('eventImageFile').addEventListener('change', function(e) {
         const file = e.target.files[0];
         const imagePreview = document.getElementById('imagePreview');
-        
         if (file) {
-            // Validate file type
-            const validTypes = ['image/jpeg', 'image/jpg', 'image/png', 'image/gif', 'image/webp'];
-            if (!validTypes.includes(file.type)) {
-                alert('Invalid file type. Please upload JPEG, PNG, GIF, or WebP images only.');
-                e.target.value = '';
-                return;
-            }
-            
-            // Validate file size (max 2MB)
-            if (file.size > 2 * 1024 * 1024) {
-                alert('Image is too large. Maximum size is 2MB. Please compress the image first.');
-                e.target.value = '';
-                return;
-            }
-            
             const reader = new FileReader();
             reader.onload = function(event) {
                 selectedImageData = event.target.result;
                 imagePreview.innerHTML = `<img src="${selectedImageData}" style="max-height:100px; border-radius:8px;">`;
             };
-            
-            reader.onerror = function() {
-                alert('Error reading file. Please try again.');
-                e.target.value = '';
-            };
-            
             reader.readAsDataURL(file);
         }
     });
@@ -443,130 +382,84 @@ function closeModal() {
     document.getElementById('eventModal').classList.remove('active');
 }
 
-async function handleFormSubmit(e) {
+function handleFormSubmit(e) {
     e.preventDefault();
     
     const id = document.getElementById('eventId').value;
-    
-    // Validate and sanitize inputs
-    const title = document.getElementById('eventTitle').value.trim();
-    const date = document.getElementById('eventDate').value.trim();
-    const venue = document.getElementById('eventVenue').value.trim();
-    const description = document.getElementById('eventDescription').value.trim();
-    const type = document.getElementById('eventType').value;
-    const image = selectedImageData || document.getElementById('eventImage').value.trim();
-    
-    // Validation
-    if (!title || !date || !venue || !description) {
-        alert('Please fill in all required fields.');
-        return;
-    }
-    
-    if (title.length > 200) {
-        alert('Event title is too long (max 200 characters).');
-        return;
-    }
-    
-    if (description.length > 5000) {
-        alert('Event description is too long (max 5000 characters).');
-        return;
-    }
-    
     const eventData = {
-        title,
-        date,
-        venue,
-        description,
-        type,
-        image
+        id: id ? parseInt(id) : Date.now(),
+        title: document.getElementById('eventTitle').value,
+        date: document.getElementById('eventDate').value,
+        venue: document.getElementById('eventVenue').value,
+        description: document.getElementById('eventDescription').value,
+        type: document.getElementById('eventType').value,
+        image: selectedImageData || document.getElementById('eventImage').value
     };
     
-    let result;
     if (id) {
-        // Update existing event
-        result = await window.supabaseEvents.update(parseInt(id), eventData);
+        const index = events.findIndex(e => e.id === parseInt(id));
+        if (index !== -1) {
+            events[index] = eventData;
+        }
     } else {
-        // Create new event
-        result = await window.supabaseEvents.create(eventData);
+        events.push(eventData);
     }
     
-    if (result.success) {
-        await window.supabaseEvents.fetchAll(); // Refresh
-        renderEvents();
-        renderCMS();
-        closeModal();
-    } else {
-        alert('Error saving event: ' + result.error);
-    }
+    saveToStorage();
+    renderEvents();
+    renderCMS();
+    closeModal();
 }
 
-async function editEvent(id) {
-    const event = window.supabaseEvents.getById(id);
+function editEvent(id) {
+    const event = events.find(e => e.id === id);
     if (event) {
         openModal(event);
     }
 }
 
-async function deleteEvent(id) {
+function deleteEvent(id) {
     if (confirm('Are you sure you want to delete this event?')) {
-        const result = await window.supabaseEvents.delete(id);
-        if (result.success) {
-            renderEvents();
-            renderCMS();
-        } else {
-            alert('Error deleting event: ' + result.error);
-        }
+        events = events.filter(e => e.id !== id);
+        saveToStorage();
+        renderEvents();
+        renderCMS();
     }
 }
 
-// Removed saveToStorage() - now using Supabase database
-// Removed exportData() - now using window.supabaseEvents.exportData()
+function saveToStorage() {
+    localStorage.setItem('gmci_events', JSON.stringify(events));
+}
 
-async function importData(e) {
+function exportData() {
+    const dataStr = JSON.stringify(events, null, 2);
+    const blob = new Blob([dataStr], { type: 'application/json' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = 'gmci-events.json';
+    a.click();
+    URL.revokeObjectURL(url);
+}
+
+function importData(e) {
     const file = e.target.files[0];
     if (file) {
-        // Validate file size (max 5MB)
-        if (file.size > 5 * 1024 * 1024) {
-            alert('File is too large. Maximum size is 5MB.');
-            return;
-        }
-        
-        // Validate file type
-        if (!file.type.includes('json')) {
-            alert('Invalid file type. Please select a JSON file.');
-            return;
-        }
-        
         const reader = new FileReader();
-        reader.onload = async function(event) {
+        reader.onload = function(event) {
             try {
                 const importedEvents = JSON.parse(event.target.result);
-                
-                // Validate structure
-                if (!Array.isArray(importedEvents)) {
-                    throw new Error('Invalid data format: expected an array');
-                }
-                
-                // Import to Supabase
-                const result = await window.supabaseEvents.importData(importedEvents);
-                
-                if (result.success) {
+                if (Array.isArray(importedEvents)) {
+                    events = importedEvents;
+                    saveToStorage();
                     renderEvents();
                     renderCMS();
                     alert('Data imported successfully!');
-                } else {
-                    alert('Error importing data: ' + result.error);
                 }
             } catch (err) {
-                alert('Invalid JSON file: ' + err.message);
-                console.error('Import error:', err);
+                alert('Invalid JSON file');
             }
         };
-        
-        reader.onerror = function() {
-            alert('Error reading file.');
-        };
-        
         reader.readAsText(file);
     }
 }
