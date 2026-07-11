@@ -10,7 +10,6 @@ const testEvent: Event = {
   venue: 'Test Venue',
   description: 'Test event description',
   type: 'upcoming',
-  image: null,
 }
 
 describe('EventCard', () => {

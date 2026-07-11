@@ -33,7 +33,13 @@ describe('useAuth', () => {
   it('sets isLoggedIn to true when there is a session', async () => {
     const { supabase } = await import('@/lib/supabase')
     vi.mocked(supabase.auth.getSession).mockResolvedValue({
-      data: { session: { user: {} } },
+      data: { session: {
+        user: { id: '1', app_metadata: {}, user_metadata: {}, aud: 'authenticated', created_at: '2024-01-01' },
+        access_token: 'token',
+        refresh_token: 'refresh',
+        expires_in: 3600,
+        token_type: 'bearer',
+      } },
       error: null,
     })
     const { result } = renderHook(() => useAuth())
@@ -44,7 +50,16 @@ describe('useAuth', () => {
   it('login returns true on successful login', async () => {
     const { supabase } = await import('@/lib/supabase')
     vi.mocked(supabase.auth.signInWithPassword).mockResolvedValue({
-      data: { user: {}, session: {} },
+      data: {
+        user: { id: '1', app_metadata: {}, user_metadata: {}, aud: 'authenticated', created_at: '2024-01-01' },
+        session: {
+          access_token: 'token',
+          refresh_token: 'refresh',
+          expires_in: 3600,
+          token_type: 'bearer',
+          user: { id: '1', app_metadata: {}, user_metadata: {}, aud: 'authenticated', created_at: '2024-01-01' },
+        },
+      },
       error: null,
     })
     const { result } = renderHook(() => useAuth())

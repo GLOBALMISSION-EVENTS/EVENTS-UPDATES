@@ -9,7 +9,7 @@ const queryClient = new QueryClient()
 function App() {
   return (
     <QueryClientProvider client={queryClient}>
-      <Router>
+      <Router basename="/EVENTS-UPDATES/">
         <Routes>
           <Route path="/" element={<Home />} />
           <Route path="/qrcode" element={<QRCodeGenerator />} />
