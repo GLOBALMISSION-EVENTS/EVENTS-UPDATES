@@ -119,6 +119,7 @@ const defaultFormData = {
   position: 0,
   title: '',
   date: '',
+  event_date: '',
   venue: '',
   description: '',
   type: 'upcoming' as 'upcoming' | 'recent',
@@ -188,6 +189,7 @@ const EventsTab = ({
         position: event.position,
         title: event.title,
         date: event.date,
+        event_date: (event as Event & { event_date?: string }).event_date || '',
         venue: event.venue,
         description: event.description,
         type: event.type,
@@ -220,9 +222,11 @@ const EventsTab = ({
       image: selectedImageFile || formData.image,
     }
     if (editingEvent) {
-      onUpdateEvent(editingEvent.id, eventData)
+      const { event_date, ...rest } = eventData
+      onUpdateEvent(editingEvent.id, { ...rest, event_date: event_date || undefined })
     } else {
-      onAddEvent(eventData)
+      const { event_date, ...rest } = eventData
+      onAddEvent({ ...rest, event_date: event_date || undefined })
     }
     handleCloseModal()
   }
@@ -399,6 +403,23 @@ const EventsTab = ({
               required
             />
             {errors.date && <p className="text-red-600 text-sm mt-1">{errors.date}</p>}
+          </div>
+
+          <div>
+            <label htmlFor="cms-event-event-date" className="block text-sm font-semibold text-text-dark mb-2">
+              Event Date <span className="text-text-light font-normal">(for auto-categorization)</span>
+            </label>
+            <Input
+              id="cms-event-event-date"
+              type="date"
+              value={formData.event_date}
+              onChange={(e) =>
+                setFormData((prev) => ({ ...prev, event_date: e.target.value }))
+              }
+            />
+            <p className="text-xs text-text-light mt-1">
+              Events past this date are automatically moved to "Recent".
+            </p>
           </div>
 
           <div>

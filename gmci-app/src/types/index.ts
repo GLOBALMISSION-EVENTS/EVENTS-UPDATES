@@ -3,6 +3,7 @@ export interface Event {
   position: number;
   title: string;
   date: string;
+  event_date?: string;
   venue: string;
   description: string;
   type: 'upcoming' | 'recent';

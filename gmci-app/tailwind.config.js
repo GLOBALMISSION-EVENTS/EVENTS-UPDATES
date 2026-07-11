@@ -19,6 +19,9 @@ export default {
         sans: ['Poppins', 'sans-serif'],
         serif: ['Playfair Display', 'serif'],
       },
+      transitionDuration: {
+        '600': '600ms',
+      },
     },
   },
   plugins: [],

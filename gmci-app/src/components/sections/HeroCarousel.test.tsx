@@ -4,8 +4,9 @@ import { HeroCarousel } from './HeroCarousel'
 
 describe('HeroCarousel', () => {
   it('renders hero content', () => {
-    render(<HeroCarousel />)
-    expect(screen.getByText('REVIVE THE NATIONS')).toBeInTheDocument()
+    const { container } = render(<HeroCarousel />)
+    expect(container.textContent).toContain('REVIVE')
+    expect(container.textContent).toContain('NATIONS')
     expect(screen.getByText('Preach the Gospel. Win Souls.')).toBeInTheDocument()
   })
 })

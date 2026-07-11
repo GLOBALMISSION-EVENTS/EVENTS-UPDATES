@@ -7,6 +7,7 @@ const INITIAL_EVENTS: Omit<Event, 'id'>[] = [
     position: 1,
     title: 'Mission Impact Breakfast',
     date: '10th July 2026 - 9AM',
+    event_date: '2026-07-10',
     venue: 'Y.M.C.A. Hall - Nyeri Town',
     description: 'Join us for a morning of fellowship, prayer, and inspiration as we unite in fundraising for the Great August Harvest, 5th Annual Mega Conference & Medical Camp. Breakfast will be served. Come Hungry - Leave Inspired. Blessed are those who hunger and thirst for righteousness, for they shall be filled. Mat 5:6 (NIV)',
     type: 'upcoming',
@@ -16,6 +17,7 @@ const INITIAL_EVENTS: Omit<Event, 'id'>[] = [
     position: 2,
     title: '5th Annual Mega Conference & Free Medical Camp',
     date: '9-16th August 2026 from 9AM',
+    event_date: '2026-08-09',
     venue: 'Kiamariga Nursery Grounds',
     description: 'Theme: Healing the Land - Amos 9:14 From Exile to Divine Restoration. All Are Welcome! Featuring: Rev. Anthony Waithaka (Director - GMCI), Archbishop Simon Githiga (Elim Pentecostal Kenya), Bishop Moses Mbugua (Redeemed Gospel Church Thika), Apostle Anthony Ngumo (Reigners Chapel), Rev. James Nyaga (Excellent Glory Center), Bishop Dr. Margaret Wangare (Anointed Christian Fellowship Banana).',
     type: 'upcoming',
@@ -25,6 +27,7 @@ const INITIAL_EVENTS: Omit<Event, 'id'>[] = [
     position: 3,
     title: 'Conference & Medical Camp @ Kiamariga',
     date: '9th -16th August 2026',
+    event_date: '2026-08-09',
     venue: 'Kiamariga',
     description: 'Our 5th Annual Conference & Medical Camp',
     type: 'upcoming',
@@ -63,12 +66,36 @@ export const useEvents = () => {
           .from('events')
           .select('*')
           .order('position', { ascending: true })
-        return (seeded || []) as Event[]
+        return autoCategorizeEvents((seeded || []) as Event[])
       }
 
-      return data as Event[]
+      return autoCategorizeEvents(data as Event[])
     },
   })
+
+  const autoCategorizeEvents = async (events: Event[]): Promise<Event[]> => {
+    const today = new Date().toISOString().split('T')[0]
+    const updated: Event[] = []
+
+    for (const event of events) {
+      if (event.event_date && event.event_date < today && event.type === 'upcoming') {
+        const { error } = await supabase
+          .from('events')
+          .update({ type: 'recent' })
+          .eq('id', event.id)
+        if (error) {
+          console.error('Error auto-categorizing event:', error)
+          updated.push(event)
+        } else {
+          updated.push({ ...event, type: 'recent' })
+        }
+      } else {
+        updated.push(event)
+      }
+    }
+
+    return updated
+  }
 
   const addEventMutation = useMutation({
     mutationFn: async (newEvent: Omit<Event, 'id'>) => {

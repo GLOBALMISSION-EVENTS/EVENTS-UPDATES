@@ -1,5 +1,4 @@
-import { useState, useEffect, useCallback } from 'react'
-import { ChevronLeft, ChevronRight } from 'lucide-react'
+import { useState, useEffect } from 'react'
 import { getImageUrl } from '@/lib/utils'
 import type { HeroSlide } from '@/types'
 
@@ -7,118 +6,126 @@ interface HeroCarouselProps {
   slides?: HeroSlide[]
 }
 
-const AUTO_PLAY_INTERVAL = 12000
+const PHRASES = [
+  'Preach the Gospel. Win Souls.',
+  'Heal the Nations. Restore Hope.',
+  'Raise the Next Generation.',
+  'Ignite Revival Worldwide.',
+]
+
+const SCRIPTURES = [
+  'Matthew 5:6 — Blessed are those who hunger and thirst for righteousness',
+  'Amos 9:14 — From Exile to Divine Restoration',
+  'Isaiah 61:1 — Proclaim freedom for the captives',
+  'Mark 16:15 — Go into all the world and preach the gospel',
+]
 
 export const HeroCarousel = ({ slides = [] }: HeroCarouselProps) => {
-  const [currentSlide, setCurrentSlide] = useState(0)
-  const slideCount = slides.length || 1
+  const [phraseIndex, setPhraseIndex] = useState(0)
+  const [scriptureIndex, setScriptureIndex] = useState(0)
+  const [showText, setShowText] = useState(true)
 
-  const nextSlide = useCallback(() => {
-    setCurrentSlide((prev) => (prev + 1) % slideCount)
-  }, [slideCount])
-
-  const prevSlide = useCallback(() => {
-    setCurrentSlide((prev) => (prev - 1 + slideCount) % slideCount)
-  }, [slideCount])
-
-  const goToSlide = (index: number) => {
-    setCurrentSlide(index)
-  }
+  const heroImage = slides[0]?.image || '/images/hero images/global.webp'
 
   useEffect(() => {
-    const interval = setInterval(nextSlide, AUTO_PLAY_INTERVAL)
-    return () => clearInterval(interval)
-  }, [nextSlide])
+    const phraseInterval = setInterval(() => {
+      setShowText(false)
+      setTimeout(() => {
+        setPhraseIndex((prev) => (prev + 1) % PHRASES.length)
+        setShowText(true)
+      }, 600)
+    }, 4000)
 
-  const getSlideIndex = (offset: number) =>
-    (currentSlide + offset + slideCount) % slideCount
+    return () => clearInterval(phraseInterval)
+  }, [])
 
-  const shouldRender = (index: number) => {
-    return (
-      index === currentSlide ||
-      index === getSlideIndex(1) ||
-      index === getSlideIndex(-1)
-    )
-  }
+  useEffect(() => {
+    const scriptureInterval = setInterval(() => {
+      setScriptureIndex((prev) => (prev + 1) % SCRIPTURES.length)
+    }, 8000)
+
+    return () => clearInterval(scriptureInterval)
+  }, [])
 
   return (
     <div className="relative w-full h-screen overflow-hidden">
-      {slides.map((slide, index) => (
-        <div
-          key={slide.id}
-          className={`absolute inset-0 transition-opacity duration-[2500ms] ease-in-out ${
-            index === currentSlide ? 'opacity-100 z-10' : 'opacity-0 z-0'
-          }`}
-        >
-          {shouldRender(index) && (
-            <>
-              <div
-                className="absolute -inset-[10%] w-[120%] h-[120%] bg-cover bg-center blur-[25px] z-0 opacity-40 animate-slow-pan"
-                style={{ backgroundImage: `url(${getImageUrl(slide.image)})` }}
-              />
-              <img
-                src={getImageUrl(slide.image)}
-                alt={slide.alt}
-                className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-full h-full object-cover z-10 opacity-95"
+      <div
+        className="absolute inset-0 bg-cover bg-center"
+        style={{ backgroundImage: `url(${getImageUrl(heroImage)})` }}
+      />
+
+      <img
+        src={getImageUrl(heroImage)}
+        alt="Global Mission For Christ International"
+        className="absolute inset-0 w-full h-full object-cover"
+        width="1920"
+        height="1080"
+        loading="eager"
+      />
+
+      <div className="absolute inset-0 bg-gradient-to-b from-dark/80 via-dark/50 to-dark/90 z-10" />
+      <div className="absolute inset-0 bg-gradient-to-r from-primary/20 via-transparent to-secondary/10 z-10" />
+
+      <div className="absolute top-0 left-0 right-0 z-0 overflow-hidden h-full pointer-events-none">
+        <div className="absolute -top-1/2 -left-1/2 w-full h-full bg-secondary/10 rounded-full blur-[120px] animate-pulse" />
+        <div className="absolute -bottom-1/2 -right-1/2 w-3/4 h-3/4 bg-primary/10 rounded-full blur-[100px] animate-pulse" style={{ animationDelay: '2s' }} />
+      </div>
+
+      <div className="absolute inset-0 z-20 flex flex-col items-center justify-center text-white text-center px-4">
+        <div className="max-w-5xl mx-auto">
+          <p className="text-sm md:text-base font-medium tracking-[0.3em] uppercase text-secondary mb-6 opacity-0 animate-fade-in" style={{ animationDelay: '0.3s', animationFillMode: 'forwards' }}>
+            Global Mission For Christ International
+          </p>
+
+          <h1 className="text-5xl sm:text-6xl md:text-7xl lg:text-8xl font-extrabold mb-4 font-serif leading-tight">
+            {'REVIVE THE NATIONS'.split('').map((char, i) => (
+              <span
+                key={i}
+                className="inline-block opacity-0 animate-fade-in"
                 style={{
-                  filter: 'drop-shadow(0 20px 30px rgba(0,0,0,0.6))',
+                  animationDelay: `${0.8 + i * 0.035}s`,
+                  animationFillMode: 'forwards',
                 }}
-                loading={index === currentSlide ? 'eager' : 'lazy'}
-                width="1920"
-                height="1080"
-              />
-              <div className="absolute inset-0 bg-gradient-to-b from-dark/90 via-dark/60 to-dark/95 z-20 pointer-events-none" />
-            </>
-          )}
+              >
+                {char === ' ' ? '\u00A0' : char}
+              </span>
+            ))}
+          </h1>
+
+          <div className="h-12 md:h-14 flex items-center justify-center mb-6">
+            <p
+              className={`text-xl sm:text-2xl md:text-3xl font-semibold text-white/90 transition-all duration-600 ${
+                showText ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4'
+              }`}
+            >
+              {PHRASES[phraseIndex]}
+            </p>
+          </div>
+
+          <div className="h-8 flex items-center justify-center mb-10">
+            <p className="text-sm md:text-base text-secondary/80 font-medium italic transition-all duration-500">
+              "{SCRIPTURES[scriptureIndex]}"
+            </p>
+          </div>
+
+          <div className="opacity-0 animate-fade-in" style={{ animationDelay: '2s', animationFillMode: 'forwards' }}>
+            <a
+              href="#events"
+              className="inline-block bg-secondary hover:bg-secondary/90 text-white px-10 py-4 rounded-lg font-semibold text-lg transition-all duration-300 hover:scale-105 hover:shadow-2xl hover:shadow-secondary/30"
+            >
+              View Upcoming Events
+            </a>
+          </div>
         </div>
-      ))}
-
-      <div className="absolute top-0 left-0 right-0 bottom-0 z-30 flex flex-col items-center justify-center text-white text-center px-4">
-        <h1 className="text-5xl md:text-7xl font-extrabold mb-4 font-serif">
-          REVIVE THE NATIONS
-        </h1>
-        <h2 className="text-2xl md:text-4xl font-semibold mb-4">
-          Preach the Gospel. Win Souls.
-        </h2>
-        <p className="text-lg md:text-xl text-gray-300 mb-8">
-          Christ for Every Nation
-        </p>
-        <a
-          href="#events"
-          className="bg-secondary hover:bg-secondary/90 text-white px-8 py-4 rounded-lg font-semibold text-lg transition-all duration-300 hover:scale-105"
-        >
-          View Upcoming Events
-        </a>
       </div>
 
-      <div className="absolute bottom-32 left-1/2 -translate-x-1/2 z-40 flex gap-5">
-        <button
-          onClick={prevSlide}
-          className="w-12 h-12 bg-white/20 border-2 border-white/40 text-white text-2xl rounded-full cursor-pointer transition-all duration-300 hover:bg-secondary hover:border-secondary hover:scale-110 backdrop-blur-md"
-          aria-label="Previous slide"
-        >
-          <ChevronLeft className="w-6 h-6 mx-auto" />
-        </button>
-        <button
-          onClick={nextSlide}
-          className="w-12 h-12 bg-white/20 border-2 border-white/40 text-white text-2xl rounded-full cursor-pointer transition-all duration-300 hover:bg-secondary hover:border-secondary hover:scale-110 backdrop-blur-md"
-          aria-label="Next slide"
-        >
-          <ChevronRight className="w-6 h-6 mx-auto" />
-        </button>
-      </div>
-
-      <div className="absolute bottom-16 left-1/2 -translate-x-1/2 z-40 flex gap-3">
+      <div className="absolute bottom-8 left-0 right-0 z-20 flex justify-center gap-2">
         {slides.map((_, index) => (
-          <button
+          <span
             key={index}
-            onClick={() => goToSlide(index)}
-            className={`w-3 h-3 rounded-full cursor-pointer transition-all duration-300 ${
-              index === currentSlide
-                ? 'bg-secondary scale-125'
-                : 'bg-white/50 hover:bg-white/80'
+            className={`w-2 h-2 rounded-full transition-all duration-300 ${
+              index === 0 ? 'bg-secondary w-6' : 'bg-white/30'
             }`}
-            aria-label={`Go to slide ${index + 1}`}
           />
         ))}
       </div>
