@@ -22,7 +22,7 @@ describe('Navbar', () => {
         <Navbar isLoggedIn={true} onLogout={vi.fn()} />
       </MemoryRouter>
     )
-    expect(screen.getByText('CMS Admin')).toBeInTheDocument()
+    expect(screen.getByText('Admin')).toBeInTheDocument()
     expect(screen.getByText('QR Generator')).toBeInTheDocument()
     expect(screen.getByText('Logout')).toBeInTheDocument()
   })

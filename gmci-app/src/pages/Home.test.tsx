@@ -57,7 +57,7 @@ describe('Home Page', () => {
     await waitFor(() => expect(screen.queryByText('Loading...')).not.toBeInTheDocument())
 
     expect(screen.getByRole('heading', { name: 'About Us' })).toBeInTheDocument()
-    expect(screen.getByText('Admin Login')).toBeInTheDocument()
+    expect(screen.getByText('Admin')).toBeInTheDocument()
     expect(screen.getByText('Contact Us')).toBeInTheDocument()
   })
 })
