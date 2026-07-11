@@ -66,6 +66,6 @@ describe('LoginSection', () => {
     )
 
     // Check success message
-    expect(screen.getByText('Password reset email sent. Please check your inbox.')).toBeInTheDocument()
+    expect(screen.getByText('Password reset email sent! Please check your inbox.')).toBeInTheDocument()
   })
 })
