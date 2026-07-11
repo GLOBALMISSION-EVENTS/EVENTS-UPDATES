@@ -1,5 +1,13 @@
 # Dependencies
 node_modules/
+gmci-app/node_modules/
+
+# Build outputs
+gmci-app/dist/
+dist/
+
+# Old prototype
+prototype/
 
 # OS files
 .DS_Store
