@@ -98,6 +98,7 @@ export const Navbar = ({ isLoggedIn = false, onLogout }: NavbarProps) => {
 
           <button
             onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
+            aria-label={isMobileMenuOpen ? "Close menu" : "Open menu"}
             className="md:hidden text-white p-2"
           >
             {isMobileMenuOpen ? (

@@ -28,6 +28,7 @@ export const Modal = ({ isOpen, onClose, title, children }: ModalProps) => {
           <h2 className="text-2xl font-bold text-text-dark">{title}</h2>
           <button
             onClick={onClose}
+            aria-label="Close modal"
             className="p-2 hover:bg-gray-100 rounded-full transition-colors"
           >
             <X className="w-6 h-6 text-text-light" />
