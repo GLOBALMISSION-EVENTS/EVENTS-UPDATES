@@ -1,6 +1,7 @@
 
 import { Card, CardContent } from '@/components/ui/card'
 import type { Event } from '@/types'
+import { getImageUrl } from '@/lib/utils'
 
 interface EventCardProps {
   event: Event
@@ -12,7 +13,7 @@ export const EventCard = ({ event }: EventCardProps) => {
       <div className="relative h-56 overflow-hidden">
         {event.image ? (
           <img
-            src={event.image}
+            src={event.image.startsWith('http') ? event.image : getImageUrl(event.image)}
             alt={event.title}
             className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700"
             loading="lazy"

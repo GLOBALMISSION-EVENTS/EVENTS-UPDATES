@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { Menu, X } from 'lucide-react'
 import { Link, useLocation } from 'react-router-dom'
+import { getImageUrl } from '@/lib/utils'
 
 interface NavbarProps {
   isLoggedIn?: boolean
@@ -47,7 +48,7 @@ export const Navbar = ({ isLoggedIn = false, onLogout }: NavbarProps) => {
           <div className="flex items-center space-x-4">
             <Link to="/">
               <img
-                src="/images/GLOBAL LOGO.png"
+                src={getImageUrl('/images/GLOBAL LOGO.png')}
                 alt="GMCI Logo"
                 className="h-12 w-12 object-contain"
               />

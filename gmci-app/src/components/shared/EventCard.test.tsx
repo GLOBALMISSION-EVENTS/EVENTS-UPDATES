@@ -28,6 +28,6 @@ describe('EventCard', () => {
 
   it('renders image when provided', () => {
     render(<EventCard event={{ ...testEvent, image: 'test-image.jpg' }} />)
-    expect(screen.getByAltText('Test Event')).toHaveAttribute('src', 'test-image.jpg')
+    expect(screen.getByAltText('Test Event')).toHaveAttribute('src', '/test-image.jpg')
   })
 })

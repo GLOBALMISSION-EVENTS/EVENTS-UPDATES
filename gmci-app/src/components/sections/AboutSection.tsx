@@ -1,4 +1,5 @@
 
+import { getImageUrl } from '@/lib/utils'
 
 export const AboutSection = () => {
   const contactItems = [
@@ -20,7 +21,7 @@ export const AboutSection = () => {
 
             <div className="mb-8">
               <img
-                src="/images/about-us.png"
+                src={getImageUrl('/images/about-us.png')}
                 alt="Global Mission For Christ International"
                 className="w-full rounded-2xl shadow-xl"
               />
@@ -57,7 +58,7 @@ export const AboutSection = () => {
             <div className="bg-light-bg p-8 rounded-xl">
               <div className="flex items-start gap-6 mb-6">
                 <img
-                  src="/images/DIRECTOR.png"
+                  src={getImageUrl('/images/DIRECTOR.png')}
                   alt="Rev. Dr. Anthony Waithaka"
                   className="w-24 h-24 rounded-full object-cover"
                 />

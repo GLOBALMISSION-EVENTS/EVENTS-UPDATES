@@ -1,5 +1,6 @@
 import { useState, useEffect, useCallback } from 'react'
 import { ChevronLeft, ChevronRight } from 'lucide-react'
+import { getImageUrl } from '@/lib/utils'
 
 const SLIDES = [
   {
@@ -62,10 +63,10 @@ export const HeroCarousel = () => {
         >
           <div
             className="absolute -inset-[10%] w-[120%] h-[120%] bg-cover bg-center blur-[25px] z-0 opacity-40 animate-slow-pan"
-            style={{ backgroundImage: `url(${slide.image})` }}
+            style={{ backgroundImage: `url(${getImageUrl(slide.image)})` }}
           />
           <img
-            src={slide.image}
+            src={getImageUrl(slide.image)}
             alt={slide.alt}
             className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-full h-full object-cover z-10 opacity-95"
             style={{
