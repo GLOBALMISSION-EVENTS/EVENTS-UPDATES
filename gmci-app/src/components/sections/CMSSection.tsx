@@ -418,7 +418,7 @@ const EventsTab = ({
               }
             />
             <p className="text-xs text-text-light mt-1">
-              Events past this date are automatically moved to "Recent".
+              Events past this date are automatically moved to &quot;Recent&quot;.
             </p>
           </div>
 
