@@ -19,17 +19,27 @@ const ParticlesCanvas = () => {
     }
     window.addEventListener('resize', resize)
 
-    const count = Math.min(Math.floor((w * h) / 12000), 80)
-    const particles: { x: number; y: number; vx: number; vy: number; r: number; a: number }[] = []
+    const count = Math.min(Math.floor((w * h) / 10000), 100)
+    const particles: {
+      x: number; y: number
+      vx: number; vy: number
+      r: number; a: number
+      shape: 'circle' | 'diamond' | 'dot'
+      rot: number; rotV: number
+    }[] = []
 
     for (let i = 0; i < count; i++) {
+      const shapes: ('circle' | 'diamond' | 'dot')[] = ['circle', 'diamond', 'dot']
       particles.push({
         x: Math.random() * w,
         y: Math.random() * h,
-        vx: (Math.random() - 0.5) * 0.5,
-        vy: (Math.random() - 0.5) * 0.5,
-        r: Math.random() * 2.5 + 1,
-        a: Math.random() * 0.4 + 0.1,
+        vx: (Math.random() - 0.5) * (Math.random() * 1.2 + 0.2),
+        vy: (Math.random() - 0.5) * (Math.random() * 1.2 + 0.2),
+        r: Math.random() * 4 + 1,
+        a: Math.random() * 0.5 + 0.15,
+        shape: shapes[Math.floor(Math.random() * shapes.length)],
+        rot: Math.random() * Math.PI * 2,
+        rotV: (Math.random() - 0.5) * 0.05,
       })
     }
 
@@ -38,24 +48,46 @@ const ParticlesCanvas = () => {
       for (const p of particles) {
         p.x += p.vx
         p.y += p.vy
-        if (p.x < 0 || p.x > w) p.vx *= -1
-        if (p.y < 0 || p.y > h) p.vy *= -1
-        ctx!.beginPath()
-        ctx!.arc(p.x, p.y, p.r, 0, Math.PI * 2)
-        ctx!.fillStyle = `rgba(255,255,255,${p.a})`
-        ctx!.fill()
+        p.rot += p.rotV
+        if (p.x < -10 || p.x > w + 10) p.vx *= -1
+        if (p.y < -10 || p.y > h + 10) p.vy *= -1
+        ctx!.save()
+        ctx!.translate(p.x, p.y)
+        ctx!.rotate(p.rot)
+        ctx!.globalAlpha = p.a
+        if (p.shape === 'diamond') {
+          ctx!.beginPath()
+          ctx!.moveTo(0, -p.r)
+          ctx!.lineTo(p.r, 0)
+          ctx!.lineTo(0, p.r)
+          ctx!.lineTo(-p.r, 0)
+          ctx!.closePath()
+          ctx!.fillStyle = 'rgba(255,255,255,0.7)'
+          ctx!.fill()
+        } else if (p.shape === 'dot') {
+          ctx!.beginPath()
+          ctx!.arc(0, 0, p.r * 0.3, 0, Math.PI * 2)
+          ctx!.fillStyle = 'rgba(255,255,255,0.9)'
+          ctx!.fill()
+        } else {
+          ctx!.beginPath()
+          ctx!.arc(0, 0, p.r, 0, Math.PI * 2)
+          ctx!.fillStyle = `rgba(255,255,255,${0.4 + p.a * 0.3})`
+          ctx!.fill()
+        }
+        ctx!.restore()
       }
       for (let i = 0; i < particles.length; i++) {
         for (let j = i + 1; j < particles.length; j++) {
           const dx = particles[i].x - particles[j].x
           const dy = particles[i].y - particles[j].y
           const dist = Math.sqrt(dx * dx + dy * dy)
-          if (dist < 120) {
+          if (dist < 140) {
             ctx!.beginPath()
             ctx!.moveTo(particles[i].x, particles[i].y)
             ctx!.lineTo(particles[j].x, particles[j].y)
-            ctx!.strokeStyle = `rgba(255,255,255,${0.08 * (1 - dist / 120)})`
-            ctx!.lineWidth = 0.5
+            ctx!.strokeStyle = `rgba(255,255,255,${0.05 * (1 - dist / 140)})`
+            ctx!.lineWidth = 0.4
             ctx!.stroke()
           }
         }
@@ -73,7 +105,7 @@ const ParticlesCanvas = () => {
   return (
     <canvas
       ref={canvasRef}
-      className="absolute inset-0 z-10 pointer-events-none"
+      className="absolute inset-0 z-[15] pointer-events-none"
     />
   )
 }
@@ -183,10 +215,10 @@ export const HeroCarousel = () => {
         loading="eager"
       />
 
-      <ParticlesCanvas />
-
       <div className="absolute inset-0 bg-gradient-to-b from-dark/80 via-dark/50 to-dark/90 z-10" />
       <div className="absolute inset-0 bg-gradient-to-r from-primary/20 via-transparent to-secondary/10 z-10" />
+
+      <ParticlesCanvas />
 
       <div className="absolute top-0 left-0 right-0 z-0 overflow-hidden h-full pointer-events-none">
         <div className="absolute -top-1/2 -left-1/2 w-full h-full bg-secondary/10 rounded-full blur-[120px] animate-pulse" />
@@ -206,7 +238,7 @@ export const HeroCarousel = () => {
             Global Mission For Christ International
           </p>
 
-          <h1 className="text-5xl sm:text-6xl md:text-7xl lg:text-8xl font-extrabold mb-4 font-serif leading-tight">
+          <h1 className="text-5xl sm:text-6xl md:text-7xl lg:text-8xl font-extralight mb-4 font-sans leading-tight tracking-wide whitespace-nowrap">
             {'REVIVE THE NATIONS'.split('').map((char, i) => (
               <span
                 key={i}
