@@ -6,6 +6,10 @@ gmci-app/node_modules/
 gmci-app/dist/
 dist/
 
+# Test outputs
+gmci-app/coverage/
+coverage/
+
 # Old prototype
 prototype/
 
