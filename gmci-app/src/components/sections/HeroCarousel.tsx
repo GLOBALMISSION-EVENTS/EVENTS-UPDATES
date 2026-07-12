@@ -19,42 +19,48 @@ const ParticlesCanvas = () => {
     }
     window.addEventListener('resize', resize)
 
-    const count = Math.min(Math.floor((w * h) / 10000), 100)
+    const count = Math.min(Math.floor((w * h) / 6000), 160)
     const particles: {
       x: number; y: number
       vx: number; vy: number
-      r: number; a: number
-      shape: 'circle' | 'diamond' | 'dot'
+      r: number; baseA: number; a: number
+      pulseSpeed: number
+      shape: 'circle' | 'diamond' | 'dot' | 'star'
       rot: number; rotV: number
     }[] = []
 
+    const shapes: ('circle' | 'diamond' | 'dot' | 'star')[] = ['circle', 'diamond', 'dot', 'star']
     for (let i = 0; i < count; i++) {
-      const shapes: ('circle' | 'diamond' | 'dot')[] = ['circle', 'diamond', 'dot']
+      const angle = Math.random() * Math.PI * 2
+      const speed = Math.random() * 2 + 0.4
       particles.push({
         x: Math.random() * w,
         y: Math.random() * h,
-        vx: (Math.random() - 0.5) * (Math.random() * 1.2 + 0.2),
-        vy: (Math.random() - 0.5) * (Math.random() * 1.2 + 0.2),
-        r: Math.random() * 4 + 1,
-        a: Math.random() * 0.5 + 0.15,
+        vx: Math.cos(angle) * speed,
+        vy: Math.sin(angle) * speed,
+        r: Math.random() * 5 + 1.5,
+        baseA: Math.random() * 0.35 + 0.2,
+        a: Math.random() * 0.35 + 0.2,
+        pulseSpeed: Math.random() * 0.03 + 0.01,
         shape: shapes[Math.floor(Math.random() * shapes.length)],
         rot: Math.random() * Math.PI * 2,
-        rotV: (Math.random() - 0.5) * 0.05,
+        rotV: (Math.random() - 0.5) * 0.08,
       })
     }
 
-    const draw = () => {
+    const draw = (time: number) => {
       ctx!.clearRect(0, 0, w, h)
       for (const p of particles) {
         p.x += p.vx
         p.y += p.vy
         p.rot += p.rotV
-        if (p.x < -10 || p.x > w + 10) p.vx *= -1
-        if (p.y < -10 || p.y > h + 10) p.vy *= -1
+        p.a = p.baseA + Math.sin(time * p.pulseSpeed) * 0.15
+        if (p.x < -20 || p.x > w + 20) p.vx *= -1
+        if (p.y < -20 || p.y > h + 20) p.vy *= -1
         ctx!.save()
         ctx!.translate(p.x, p.y)
         ctx!.rotate(p.rot)
-        ctx!.globalAlpha = p.a
+        ctx!.globalAlpha = Math.max(0.1, p.a)
         if (p.shape === 'diamond') {
           ctx!.beginPath()
           ctx!.moveTo(0, -p.r)
@@ -62,17 +68,31 @@ const ParticlesCanvas = () => {
           ctx!.lineTo(0, p.r)
           ctx!.lineTo(-p.r, 0)
           ctx!.closePath()
-          ctx!.fillStyle = 'rgba(255,255,255,0.7)'
+          ctx!.fillStyle = 'rgba(200,220,255,0.8)'
           ctx!.fill()
         } else if (p.shape === 'dot') {
           ctx!.beginPath()
-          ctx!.arc(0, 0, p.r * 0.3, 0, Math.PI * 2)
-          ctx!.fillStyle = 'rgba(255,255,255,0.9)'
+          ctx!.arc(0, 0, p.r * 0.35, 0, Math.PI * 2)
+          ctx!.fillStyle = 'rgba(255,255,255,0.95)'
+          ctx!.fill()
+        } else if (p.shape === 'star') {
+          const spikes = 4
+          const outerR = p.r
+          const innerR = p.r * 0.4
+          ctx!.beginPath()
+          for (let k = 0; k < spikes * 2; k++) {
+            const rad = k % 2 === 0 ? outerR : innerR
+            const a = (k * Math.PI) / spikes - Math.PI / 2
+            if (k === 0) ctx!.moveTo(Math.cos(a) * rad, Math.sin(a) * rad)
+            else ctx!.lineTo(Math.cos(a) * rad, Math.sin(a) * rad)
+          }
+          ctx!.closePath()
+          ctx!.fillStyle = 'rgba(255,255,255,0.7)'
           ctx!.fill()
         } else {
           ctx!.beginPath()
           ctx!.arc(0, 0, p.r, 0, Math.PI * 2)
-          ctx!.fillStyle = `rgba(255,255,255,${0.4 + p.a * 0.3})`
+          ctx!.fillStyle = `rgba(180,210,255,${0.5 + p.baseA * 0.3})`
           ctx!.fill()
         }
         ctx!.restore()
@@ -82,19 +102,19 @@ const ParticlesCanvas = () => {
           const dx = particles[i].x - particles[j].x
           const dy = particles[i].y - particles[j].y
           const dist = Math.sqrt(dx * dx + dy * dy)
-          if (dist < 140) {
+          if (dist < 150) {
             ctx!.beginPath()
             ctx!.moveTo(particles[i].x, particles[i].y)
             ctx!.lineTo(particles[j].x, particles[j].y)
-            ctx!.strokeStyle = `rgba(255,255,255,${0.05 * (1 - dist / 140)})`
-            ctx!.lineWidth = 0.4
+            ctx!.strokeStyle = `rgba(180,210,255,${0.04 * (1 - dist / 150)})`
+            ctx!.lineWidth = 0.5
             ctx!.stroke()
           }
         }
       }
       animId = requestAnimationFrame(draw)
     }
-    draw()
+    draw(0)
 
     return () => {
       cancelAnimationFrame(animId)

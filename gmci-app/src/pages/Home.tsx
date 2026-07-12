@@ -20,8 +20,8 @@ export const Home = () => {
 
   return (
     <div className="min-h-screen">
-      <header id="home" className="relative bg-dark">
-        <Navbar />
+      <Navbar />
+      <header id="home" className="relative">
         <HeroCarousel />
       </header>
 

@@ -37,7 +37,7 @@ export const AdminPage = () => {
     <div className="min-h-screen bg-light-bg">
       <Navbar isLoggedIn={isLoggedIn} onLogout={logout} />
 
-      <div className="pt-28 pb-20">
+      <div className="pt-8 pb-20">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="mb-8">
             <h1 className="text-3xl md:text-4xl font-bold text-text-dark">CMS Admin</h1>

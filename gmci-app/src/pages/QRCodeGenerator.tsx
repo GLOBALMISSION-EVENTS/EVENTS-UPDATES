@@ -69,7 +69,7 @@ export const QRCodeGenerator = () => {
     <div className="min-h-screen bg-light-bg">
       <Navbar isLoggedIn={isLoggedIn} onLogout={logout} />
       
-      <div className="pt-32 pb-20">
+      <div className="pt-8 pb-20">
         <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="mb-8">
             <Link

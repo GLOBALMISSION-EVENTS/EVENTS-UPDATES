@@ -27,7 +27,7 @@ export const LoginPage = () => {
   return (
     <div className="min-h-screen bg-light-bg">
       <Navbar isLoggedIn={isLoggedIn} onLogout={logout} />
-      <div className="pt-28 pb-20">
+      <div className="pt-8 pb-20">
         <LoginSection onLogin={handleLogin} onForgotPassword={forgotPassword} />
       </div>
       <Footer />

@@ -43,7 +43,7 @@ export const Navbar = ({ isLoggedIn = false, onLogout }: NavbarProps) => {
   }
 
   return (
-    <nav className="absolute top-0 left-0 right-0 z-40 bg-transparent">
+    <nav className="bg-dark text-white">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex items-center justify-between h-24">
           <div className="flex items-center space-x-4">
