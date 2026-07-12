@@ -29,6 +29,7 @@ export const HeroCarousel = ({ slides = [] }: HeroCarouselProps) => {
   const heroRef = useRef<HTMLDivElement>(null)
   const parallaxBgRef = useRef<HTMLDivElement>(null)
   const parallaxContentRef = useRef<HTMLDivElement>(null)
+  const imgRef = useRef<HTMLImageElement>(null)
 
   const heroImage = slides[0]?.image || '/images/hero images/global.webp'
 
@@ -73,6 +74,10 @@ export const HeroCarousel = ({ slides = [] }: HeroCarouselProps) => {
     return () => window.removeEventListener('scroll', handleScroll)
   }, [])
 
+  useEffect(() => {
+    imgRef.current?.setAttribute('fetchpriority', 'high')
+  }, [])
+
   const handleMouseMove = useCallback((e: React.MouseEvent<HTMLDivElement>) => {
     const rect = e.currentTarget.getBoundingClientRect()
     const x = ((e.clientX - rect.left) / rect.width) * 100
@@ -97,13 +102,13 @@ export const HeroCarousel = ({ slides = [] }: HeroCarouselProps) => {
       />
 
       <img
+        ref={imgRef}
         src={getImageUrl(heroImage)}
         alt="Global Mission For Christ International"
         className="absolute inset-0 w-full h-full object-cover will-change-transform"
         width="1920"
         height="1080"
         loading="eager"
-        fetchpriority="high"
       />
 
       <div className="absolute inset-0 bg-gradient-to-b from-dark/80 via-dark/50 to-dark/90 z-10" />
