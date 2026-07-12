@@ -265,13 +265,13 @@ export const HeroCarousel = () => {
       >
         <div className="max-w-5xl mx-auto">
           <p
-            className="text-sm md:text-base font-medium tracking-[0.3em] uppercase text-secondary mb-6 opacity-0 animate-fade-in"
+            className="text-sm md:text-base font-medium tracking-[0.15em] sm:tracking-[0.3em] uppercase text-secondary mb-6 opacity-0 animate-fade-in"
             style={{ animationDelay: '0.3s', animationFillMode: 'forwards' }}
           >
             Global Mission For Christ International
           </p>
 
-          <h1 className="text-5xl sm:text-6xl md:text-7xl lg:text-8xl font-extralight mb-4 font-sans leading-tight tracking-wide whitespace-nowrap">
+          <h1 className="text-4xl sm:text-6xl md:text-7xl lg:text-8xl font-extralight mb-4 font-sans leading-tight tracking-wide">
             {'REVIVE THE NATIONS'.split('').map((char, i) => (
               <span
                 key={i}

@@ -103,13 +103,13 @@ export const QRCodeGenerator = () => {
                 <div className="block text-sm font-semibold text-text-dark mb-2">
                   QR Code Size (pixels)
                 </div>
-                <div className="flex gap-4">
+                <div className="flex flex-wrap gap-3">
                   {[256, 512, 1024, 2048].map((s) => (
                     <Button
                       key={s}
                       variant={size === s ? 'primary' : 'secondary'}
                       onClick={() => setSize(s)}
-                      className="flex-1"
+                      className="flex-1 min-w-[70px]"
                     >
                       {s}px
                     </Button>
@@ -129,12 +129,12 @@ export const QRCodeGenerator = () => {
               </div>
             </div>
 
-            <div className="flex gap-4 justify-center">
-              <Button onClick={downloadPNG} size="lg">
+            <div className="flex flex-col sm:flex-row gap-4 justify-center">
+              <Button onClick={downloadPNG} size="lg" className="w-full sm:w-auto">
                 <Download className="w-5 h-5 mr-2" />
                 Download PNG
               </Button>
-              <Button onClick={downloadSVG} variant="secondary" size="lg">
+              <Button onClick={downloadSVG} variant="secondary" size="lg" className="w-full sm:w-auto">
                 <Download className="w-5 h-5 mr-2" />
                 Download SVG
               </Button>
