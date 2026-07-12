@@ -43,7 +43,7 @@ export const Navbar = ({ isLoggedIn = false, onLogout }: NavbarProps) => {
   }
 
   return (
-    <nav className="bg-dark text-white">
+    <nav className="bg-cream text-text-dark shadow-sm">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex items-center justify-between h-24">
           <div className="flex items-center space-x-4">
@@ -56,7 +56,7 @@ export const Navbar = ({ isLoggedIn = false, onLogout }: NavbarProps) => {
                 height="48"
               />
             </Link>
-            <span className="text-xl font-bold text-white hidden sm:block">
+            <span className="text-xl font-bold hidden sm:block">
               Global Mission For Christ International
             </span>
           </div>
@@ -68,7 +68,7 @@ export const Navbar = ({ isLoggedIn = false, onLogout }: NavbarProps) => {
                   key={item.id}
                   to={item.href}
                   onClick={() => handleNavClick(item.id, item.href)}
-                  className={`text-white font-medium transition-colors hover:text-secondary ${
+                  className={`font-medium transition-colors hover:text-secondary ${
                     activeSection === item.id ? 'text-secondary' : ''
                   }`}
                 >
@@ -82,7 +82,7 @@ export const Navbar = ({ isLoggedIn = false, onLogout }: NavbarProps) => {
                     e.preventDefault()
                     handleNavClick(item.id, item.href)
                   }}
-                  className={`text-white font-medium transition-colors hover:text-secondary ${
+                  className={`font-medium transition-colors hover:text-secondary ${
                     activeSection === item.id ? 'text-secondary' : ''
                   }`}
                 >
@@ -93,7 +93,7 @@ export const Navbar = ({ isLoggedIn = false, onLogout }: NavbarProps) => {
             {isLoggedIn && onLogout && (
               <button
                 onClick={handleLogout}
-                className="bg-white/20 hover:bg-white/30 text-white px-4 py-2 rounded-lg transition-colors"
+                className="bg-dark/10 hover:bg-dark/20 px-4 py-2 rounded-lg transition-colors"
               >
                 Logout
               </button>
@@ -103,7 +103,7 @@ export const Navbar = ({ isLoggedIn = false, onLogout }: NavbarProps) => {
           <button
             onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
             aria-label={isMobileMenuOpen ? "Close menu" : "Open menu"}
-            className="md:hidden text-white p-2"
+            className="md:hidden p-2"
           >
             {isMobileMenuOpen ? (
               <X className="w-8 h-8" />
@@ -115,7 +115,7 @@ export const Navbar = ({ isLoggedIn = false, onLogout }: NavbarProps) => {
       </div>
 
       {isMobileMenuOpen && (
-        <div className="md:hidden bg-dark/95 backdrop-blur-md">
+        <div className="md:hidden bg-cream/95 backdrop-blur-md">
           <div className="px-4 py-4 space-y-3">
             {navItems.map((item) => (
               item.href.startsWith('/') ? (
@@ -123,7 +123,7 @@ export const Navbar = ({ isLoggedIn = false, onLogout }: NavbarProps) => {
                   key={item.id}
                   to={item.href}
                   onClick={() => handleNavClick(item.id, item.href)}
-                  className={`block text-white font-medium py-2 ${
+                  className={`block font-medium py-2 ${
                     activeSection === item.id ? 'text-secondary' : ''
                   }`}
                 >
@@ -137,7 +137,7 @@ export const Navbar = ({ isLoggedIn = false, onLogout }: NavbarProps) => {
                     e.preventDefault()
                     handleNavClick(item.id, item.href)
                   }}
-                  className={`block text-white font-medium py-2 ${
+                  className={`block font-medium py-2 ${
                     activeSection === item.id ? 'text-secondary' : ''
                   }`}
                 >
@@ -148,7 +148,7 @@ export const Navbar = ({ isLoggedIn = false, onLogout }: NavbarProps) => {
             {isLoggedIn && onLogout && (
               <button
                 onClick={handleLogout}
-                className="w-full text-left text-white font-medium py-2"
+                className="w-full text-left font-medium py-2"
               >
                 Logout
               </button>

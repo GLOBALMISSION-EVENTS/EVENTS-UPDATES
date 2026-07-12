@@ -21,18 +21,22 @@ CREATE TABLE IF NOT EXISTS hero_slides (
 
 ALTER TABLE hero_slides ENABLE ROW LEVEL SECURITY;
 
+DROP POLICY IF EXISTS "Public hero slides are viewable by everyone" ON hero_slides;
 CREATE POLICY "Public hero slides are viewable by everyone"
     ON hero_slides FOR SELECT
     USING (true);
 
+DROP POLICY IF EXISTS "Authenticated users can insert hero slides" ON hero_slides;
 CREATE POLICY "Authenticated users can insert hero slides"
     ON hero_slides FOR INSERT
     WITH CHECK (auth.role() = 'authenticated');
 
+DROP POLICY IF EXISTS "Authenticated users can update hero slides" ON hero_slides;
 CREATE POLICY "Authenticated users can update hero slides"
     ON hero_slides FOR UPDATE
     USING (auth.role() = 'authenticated');
 
+DROP POLICY IF EXISTS "Authenticated users can delete hero slides" ON hero_slides;
 CREATE POLICY "Authenticated users can delete hero slides"
     ON hero_slides FOR DELETE
     USING (auth.role() = 'authenticated');
@@ -62,18 +66,22 @@ CREATE TABLE IF NOT EXISTS site_content (
 
 ALTER TABLE site_content ENABLE ROW LEVEL SECURITY;
 
+DROP POLICY IF EXISTS "Public site content is viewable by everyone" ON site_content;
 CREATE POLICY "Public site content is viewable by everyone"
     ON site_content FOR SELECT
     USING (true);
 
+DROP POLICY IF EXISTS "Authenticated users can insert site content" ON site_content;
 CREATE POLICY "Authenticated users can insert site content"
     ON site_content FOR INSERT
     WITH CHECK (auth.role() = 'authenticated');
 
+DROP POLICY IF EXISTS "Authenticated users can update site content" ON site_content;
 CREATE POLICY "Authenticated users can update site content"
     ON site_content FOR UPDATE
     USING (auth.role() = 'authenticated');
 
+DROP POLICY IF EXISTS "Authenticated users can delete site content" ON site_content;
 CREATE POLICY "Authenticated users can delete site content"
     ON site_content FOR DELETE
     USING (auth.role() = 'authenticated');

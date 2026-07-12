@@ -11,6 +11,7 @@ export default {
         secondary: '#f97316',
         accent: '#22c55e',
         dark: '#0f172a',
+        cream: '#FFF8E7',
         'light-bg': '#f8fafc',
         'text-dark': '#1e293b',
         'text-light': '#64748b',
