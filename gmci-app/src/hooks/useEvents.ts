@@ -41,31 +41,75 @@ export const useEvents = () => {
   const { data: events = [], isLoading, error } = useQuery({
     queryKey: ['events'],
     queryFn: async () => {
+      console.log('🔄 Fetching events from database...')
       const { data, error } = await supabase
         .from('events')
         .select('*')
         .order('position', { ascending: true })
 
       if (error) {
-        console.error('Error fetching events:', error)
+        console.error('❌ Error fetching events:', error)
         return []
       }
 
+      console.log('📊 Raw events from database:', data)
+
+      // Migration: Add event_date to events that don't have it
+      if (data && data.length > 0) {
+        const eventsNeedingMigration = data.filter(event => !event.event_date)
+        if (eventsNeedingMigration.length > 0) {
+          console.log(`🔄 Migrating ${eventsNeedingMigration.length} events to add event_date field`)
+
+          for (const event of eventsNeedingMigration) {
+            const dateMatch = event.date?.match(/(\d{1,2})(?:st|nd|rd|th)?\s+(\w+)\s+(\d{4})/i)
+            let eventDate = null
+            if (dateMatch) {
+              const months: Record<string, string> = {
+                january: '01', february: '02', march: '03', april: '04', may: '05', june: '06',
+                july: '07', august: '08', september: '09', october: '10', november: '11', december: '12'
+              }
+              const day = dateMatch[1].padStart(2, '0')
+              const month = months[dateMatch[2].toLowerCase()] || '01'
+              eventDate = `${dateMatch[3]}-${month}-${day}`
+            }
+
+            if (eventDate) {
+              console.log(`🔄 Migrating "${event.title}" to event_date: ${eventDate}`)
+              const { error: updateError } = await supabase
+                .from('events')
+                .update({ event_date: eventDate })
+                .eq('id', event.id)
+
+              if (updateError) {
+                console.error(`❌ Migration error for "${event.title}":`, updateError)
+              } else {
+                console.log(`✅ Migrated "${event.title}" successfully`)
+                event.event_date = eventDate
+              }
+            }
+          }
+        }
+      }
+
       if (!data || data.length === 0) {
+        console.log('🌱 Seeding initial events with event_date field')
         const errors: string[] = []
         for (const event of INITIAL_EVENTS) {
+          console.log(`🌱 Seeding event: ${event.title} with date: ${event.event_date}`)
           const { error: insertError } = await supabase.from('events').insert(event)
           if (insertError) {
+            console.error(`❌ Seeding error for "${event.title}":`, insertError)
             errors.push(insertError.message)
           }
         }
         if (errors.length > 0) {
-          console.error('Error seeding events:', errors.join(', '))
+          console.error('❌ Error seeding events:', errors.join(', '))
         }
         const { data: seeded } = await supabase
           .from('events')
           .select('*')
           .order('position', { ascending: true })
+        console.log('🌱 Seeded events:', seeded)
         return await autoCategorizeEvents((seeded || []) as Event[])
       }
 
@@ -79,16 +123,22 @@ export const useEvents = () => {
 
   const autoCategorizeEvents = async (events: Event[]): Promise<Event[]> => {
     const today = new Date().toISOString().split('T')[0]
+    console.log('🔍 Auto-categorization check:', { today, eventsCount: events.length })
+    
     const updatedEvents: Event[] = []
     const eventsToUpdate: { id: number; type: 'recent' }[] = []
 
     // First pass: identify events that need updating and prepare the updated array
     for (const event of events) {
+      console.log(`📅 Checking event: "${event.title}" - Date: ${event.event_date} vs Today: ${today}`)
+      
       if (event.event_date && event.event_date < today && event.type === 'upcoming') {
+        console.log(`✅ Should move to recent: "${event.title}"`)
         // This event should be marked as recent
         eventsToUpdate.push({ id: event.id, type: 'recent' })
         updatedEvents.push({ ...event, type: 'recent' })
       } else {
+        console.log(`➡️  Keeping as ${event.type}: "${event.title}"`)
         // Keep event as-is
         updatedEvents.push(event)
       }
@@ -96,6 +146,7 @@ export const useEvents = () => {
 
     // Batch update all events that need to be changed
     if (eventsToUpdate.length > 0) {
+      console.log(`🔄 Updating ${eventsToUpdate.length} events from upcoming to recent`)
       try {
         for (const update of eventsToUpdate) {
           const { error } = await supabase
@@ -104,13 +155,17 @@ export const useEvents = () => {
             .eq('id', update.id)
           
           if (error) {
-            console.error(`Error auto-categorizing event ${update.id}:`, error)
+            console.error(`❌ Error auto-categorizing event ${update.id}:`, error)
+          } else {
+            console.log(`✅ Updated event ${update.id} to recent`)
           }
         }
-        console.log(`Auto-categorized ${eventsToUpdate.length} events from upcoming to recent`)
+        console.log(`✅ Auto-categorized ${eventsToUpdate.length} events from upcoming to recent`)
       } catch (error) {
-        console.error('Error during batch auto-categorization:', error)
+        console.error('❌ Error during batch auto-categorization:', error)
       }
+    } else {
+      console.log('ℹ️  No events need auto-categorization')
     }
 
     return updatedEvents
@@ -192,10 +247,19 @@ export const useEvents = () => {
   }
 
   const resetEvents = async () => {
+    // First delete all events
     await supabase.from('events').delete().neq('id', 0)
+    
+    // Then insert fresh events with event_date
     for (let i = 0; i < INITIAL_EVENTS.length; i++) {
-      await supabase.from('events').insert({ ...INITIAL_EVENTS[i], position: i + 1 })
+      const eventData = { ...INITIAL_EVENTS[i], position: i + 1 }
+      console.log(`🌱 Inserting fresh event: ${eventData.title} with event_date: ${eventData.event_date}`)
+      const { error } = await supabase.from('events').insert(eventData)
+      if (error) {
+        console.error(`❌ Error inserting ${eventData.title}:`, error)
+      }
     }
+    
     queryClient.invalidateQueries({ queryKey: ['events'] })
   }
 

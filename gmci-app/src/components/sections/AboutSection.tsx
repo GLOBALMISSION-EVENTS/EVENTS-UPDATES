@@ -27,7 +27,7 @@ const defaultContent = {
 }
 
 export const AboutSection = ({ content }: AboutSectionProps) => {
-  const c = content || defaultContent
+  const c = { ...defaultContent, ...Object.fromEntries(Object.entries(content || {}).filter((entry) => entry[1] != null)) }
 
   const contactItems = [
     { icon: '📞', content: c.contactPhone },
