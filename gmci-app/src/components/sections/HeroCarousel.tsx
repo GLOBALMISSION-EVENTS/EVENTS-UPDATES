@@ -296,16 +296,18 @@ export const HeroCarousel = () => {
             </p>
           </div>
 
-          <div className="h-8 flex items-center justify-center mb-10">
-            <p
-              className="text-sm md:text-base text-secondary/80 font-medium italic transition-all duration-700"
+          <div className="flex items-center justify-center mb-10">
+            <div
+              className="bg-primary/80 backdrop-blur-sm rounded-xl px-6 py-3 max-w-2xl"
               key={scriptureIndex}
               style={{
                 animation: 'fadeIn 0.7s ease-out forwards',
               }}
             >
-              &quot;{SCRIPTURES[scriptureIndex]}&quot;
-            </p>
+              <p className="text-sm md:text-base text-white font-medium italic leading-relaxed">
+                &quot;{SCRIPTURES[scriptureIndex]}&quot;
+              </p>
+            </div>
           </div>
 
           <div className="opacity-0 animate-fade-in" style={{ animationDelay: '2s', animationFillMode: 'forwards' }}>
