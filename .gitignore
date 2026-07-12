@@ -30,3 +30,6 @@ Thumbs.db
 
 # Security - DO NOT COMMIT
 generate-password-hash.html
+
+# Tool cache
+.kiro/

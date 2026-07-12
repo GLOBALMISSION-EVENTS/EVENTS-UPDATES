@@ -20,5 +20,6 @@ module.exports = {
     'react/react-in-jsx-scope': 'off',
     'react/prop-types': 'off', // We use TypeScript instead of prop-types
     'jsx-a11y/heading-has-content': 'off', // CardTitle is a flexible component
+    'react/no-unknown-property': ['error', { ignore: ['fetchpriority'] }],
   },
 }

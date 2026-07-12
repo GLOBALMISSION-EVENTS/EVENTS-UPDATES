@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useRef, useCallback } from 'react'
 import { getImageUrl } from '@/lib/utils'
 import type { HeroSlide } from '@/types'
 
@@ -24,6 +24,11 @@ export const HeroCarousel = ({ slides = [] }: HeroCarouselProps) => {
   const [phraseIndex, setPhraseIndex] = useState(0)
   const [scriptureIndex, setScriptureIndex] = useState(0)
   const [showText, setShowText] = useState(true)
+  const [scrollIndicatorVisible, setScrollIndicatorVisible] = useState(true)
+
+  const heroRef = useRef<HTMLDivElement>(null)
+  const parallaxBgRef = useRef<HTMLDivElement>(null)
+  const parallaxContentRef = useRef<HTMLDivElement>(null)
 
   const heroImage = slides[0]?.image || '/images/hero images/global.webp'
 
@@ -34,33 +39,71 @@ export const HeroCarousel = ({ slides = [] }: HeroCarouselProps) => {
         setPhraseIndex((prev) => (prev + 1) % PHRASES.length)
         setShowText(true)
       }, 600)
-    }, 4000)
-
+    }, 7000)
     return () => clearInterval(phraseInterval)
   }, [])
 
   useEffect(() => {
     const scriptureInterval = setInterval(() => {
       setScriptureIndex((prev) => (prev + 1) % SCRIPTURES.length)
-    }, 8000)
-
+    }, 10000)
     return () => clearInterval(scriptureInterval)
   }, [])
 
+  useEffect(() => {
+    let ticking = false
+    const handleScroll = () => {
+      if (!ticking) {
+        window.requestAnimationFrame(() => {
+          const sy = window.scrollY
+          setScrollIndicatorVisible(sy < 80)
+          if (parallaxBgRef.current) {
+            parallaxBgRef.current.style.transform = `translateY(${sy * 0.35}px)`
+          }
+          if (parallaxContentRef.current) {
+            parallaxContentRef.current.style.transform = `translateY(${sy * 0.15}px)`
+            parallaxContentRef.current.style.opacity = `${Math.max(1 - sy / (window.innerHeight * 0.6), 0)}`
+          }
+          ticking = false
+        })
+        ticking = true
+      }
+    }
+    window.addEventListener('scroll', handleScroll, { passive: true })
+    return () => window.removeEventListener('scroll', handleScroll)
+  }, [])
+
+  const handleMouseMove = useCallback((e: React.MouseEvent<HTMLDivElement>) => {
+    const rect = e.currentTarget.getBoundingClientRect()
+    const x = ((e.clientX - rect.left) / rect.width) * 100
+    const y = ((e.clientY - rect.top) / rect.height) * 100
+    e.currentTarget.style.setProperty('--mouse-x', `${x}%`)
+    e.currentTarget.style.setProperty('--mouse-y', `${y}%`)
+  }, [])
+
   return (
-    <div className="relative w-full h-screen overflow-hidden">
+    <div
+      ref={heroRef}
+      className="relative w-full h-screen overflow-hidden cursor-glow"
+      onMouseMove={handleMouseMove}
+    >
       <div
-        className="absolute inset-0 bg-cover bg-center"
-        style={{ backgroundImage: `url(${getImageUrl(heroImage)})` }}
+        ref={parallaxBgRef}
+        className="absolute inset-0 bg-cover bg-center will-change-transform"
+        style={{
+          backgroundImage: `url(${getImageUrl(heroImage)})`,
+          transform: 'translateY(0px)',
+        }}
       />
 
       <img
         src={getImageUrl(heroImage)}
         alt="Global Mission For Christ International"
-        className="absolute inset-0 w-full h-full object-cover"
+        className="absolute inset-0 w-full h-full object-cover will-change-transform"
         width="1920"
         height="1080"
         loading="eager"
+        fetchpriority="high"
       />
 
       <div className="absolute inset-0 bg-gradient-to-b from-dark/80 via-dark/50 to-dark/90 z-10" />
@@ -71,9 +114,16 @@ export const HeroCarousel = ({ slides = [] }: HeroCarouselProps) => {
         <div className="absolute -bottom-1/2 -right-1/2 w-3/4 h-3/4 bg-primary/10 rounded-full blur-[100px] animate-pulse" style={{ animationDelay: '2s' }} />
       </div>
 
-      <div className="absolute inset-0 z-20 flex flex-col items-center justify-center text-white text-center px-4">
+      <div
+        ref={parallaxContentRef}
+        className="absolute inset-0 z-20 flex flex-col items-center justify-center text-white text-center px-4 will-change-transform"
+        style={{ transform: 'translateY(0px)', opacity: 1 }}
+      >
         <div className="max-w-5xl mx-auto">
-          <p className="text-sm md:text-base font-medium tracking-[0.3em] uppercase text-secondary mb-6 opacity-0 animate-fade-in" style={{ animationDelay: '0.3s', animationFillMode: 'forwards' }}>
+          <p
+            className="text-sm md:text-base font-medium tracking-[0.3em] uppercase text-secondary mb-6 opacity-0 animate-fade-in"
+            style={{ animationDelay: '0.3s', animationFillMode: 'forwards' }}
+          >
             Global Mission For Christ International
           </p>
 
@@ -94,8 +144,8 @@ export const HeroCarousel = ({ slides = [] }: HeroCarouselProps) => {
 
           <div className="h-12 md:h-14 flex items-center justify-center mb-6">
             <p
-              className={`text-xl sm:text-2xl md:text-3xl font-semibold text-white/90 transition-all duration-600 ${
-                showText ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4'
+              className={`text-xl sm:text-2xl md:text-3xl font-semibold text-white/90 transition-all duration-700 ${
+                showText ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-5'
               }`}
             >
               {PHRASES[phraseIndex]}
@@ -103,7 +153,13 @@ export const HeroCarousel = ({ slides = [] }: HeroCarouselProps) => {
           </div>
 
           <div className="h-8 flex items-center justify-center mb-10">
-            <p className="text-sm md:text-base text-secondary/80 font-medium italic transition-all duration-500">
+            <p
+              className="text-sm md:text-base text-secondary/80 font-medium italic transition-all duration-700"
+              key={scriptureIndex}
+              style={{
+                animation: 'fadeIn 0.7s ease-out forwards',
+              }}
+            >
               &quot;{SCRIPTURES[scriptureIndex]}&quot;
             </p>
           </div>
@@ -119,15 +175,20 @@ export const HeroCarousel = ({ slides = [] }: HeroCarouselProps) => {
         </div>
       </div>
 
-      <div className="absolute bottom-8 left-0 right-0 z-20 flex justify-center gap-2">
-        {slides.map((_, index) => (
-          <span
-            key={index}
-            className={`w-2 h-2 rounded-full transition-all duration-300 ${
-              index === 0 ? 'bg-secondary w-6' : 'bg-white/30'
-            }`}
-          />
-        ))}
+      <div
+        className={`absolute bottom-8 left-0 right-0 z-30 flex flex-col items-center gap-2 transition-opacity duration-500 ${
+          scrollIndicatorVisible ? 'opacity-100' : 'opacity-0 pointer-events-none'
+        }`}
+      >
+        <span className="text-white/50 text-xs tracking-widest uppercase">Scroll</span>
+        <svg
+          className="w-6 h-6 text-white/50 animate-bounce"
+          fill="none"
+          stroke="currentColor"
+          viewBox="0 0 24 24"
+        >
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 14l-7 7m0 0l-7-7m7 7V3" />
+        </svg>
       </div>
     </div>
   )

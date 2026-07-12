@@ -27,7 +27,25 @@ const defaultContent = {
 }
 
 export const AboutSection = ({ content }: AboutSectionProps) => {
-  const c = { ...defaultContent, ...Object.fromEntries(Object.entries(content || {}).filter((entry) => entry[1] != null)) }
+  // Safely merge content with defaults, ensuring arrays are preserved
+  const safeContent = content || {}
+  const c = {
+    ...defaultContent,
+    ...Object.fromEntries(
+      Object.entries(safeContent).filter(([, value]) => {
+        if (value === null || value === undefined) return false
+        if (Array.isArray(value) && value.length === 0) return false
+        return true
+      })
+    )
+  }
+
+  // Ensure critical arrays exist
+  c.directorMessage = c.directorMessage || defaultContent.directorMessage
+  c.values = c.values || defaultContent.values
+  c.contactPhone = c.contactPhone || defaultContent.contactPhone
+  c.contactEmail = c.contactEmail || defaultContent.contactEmail
+  c.contactAddress = c.contactAddress || defaultContent.contactAddress
 
   const contactItems = [
     { icon: '📞', content: c.contactPhone },
