@@ -5,7 +5,6 @@ import { HeroCarousel } from '@/components/sections/HeroCarousel'
 import { EventsSection } from '@/components/sections/EventsSection'
 import { AboutSection } from '@/components/sections/AboutSection'
 import { useEvents } from '@/hooks/useEvents'
-import { useHeroSlides } from '@/hooks/useHeroSlides'
 import { useAboutContent } from '@/hooks/useAboutContent'
 import type { AboutContent } from '@/types'
 
@@ -16,8 +15,6 @@ export const Home = () => {
     error: eventsError,
   } = useEvents()
 
-  const { slides } = useHeroSlides()
-
   const { content: aboutContent } = useAboutContent()
   const cmsAboutContent: AboutContent | null = aboutContent ?? null
 
@@ -25,7 +22,7 @@ export const Home = () => {
     <div className="min-h-screen">
       <header id="home" className="relative bg-dark">
         <Navbar />
-        <HeroCarousel slides={slides} />
+        <HeroCarousel />
       </header>
 
       <main>

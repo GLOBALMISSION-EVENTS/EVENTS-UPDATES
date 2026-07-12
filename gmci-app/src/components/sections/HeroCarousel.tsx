@@ -1,11 +1,5 @@
 import { useState, useEffect, useRef, useCallback } from 'react'
 import { getImageUrl } from '@/lib/utils'
-import type { HeroSlide } from '@/types'
-
-interface HeroCarouselProps {
-  slides?: HeroSlide[]
-}
-
 const ParticlesCanvas = () => {
   const canvasRef = useRef<HTMLCanvasElement>(null)
 
@@ -98,7 +92,7 @@ const SCRIPTURES = [
   'Mark 16:15 — Go into all the world and preach the gospel',
 ]
 
-export const HeroCarousel = ({ slides = [] }: HeroCarouselProps) => {
+export const HeroCarousel = () => {
   const [phraseIndex, setPhraseIndex] = useState(0)
   const [scriptureIndex, setScriptureIndex] = useState(0)
   const [showText, setShowText] = useState(true)
@@ -109,7 +103,7 @@ export const HeroCarousel = ({ slides = [] }: HeroCarouselProps) => {
   const parallaxContentRef = useRef<HTMLDivElement>(null)
   const imgRef = useRef<HTMLImageElement>(null)
 
-  const heroImage = slides[0]?.image || '/images/istockphoto-1473132437-612x612.jpg'
+  const heroImage = '/images/istockphoto-1473132437-612x612.jpg'
 
   useEffect(() => {
     const phraseInterval = setInterval(() => {
