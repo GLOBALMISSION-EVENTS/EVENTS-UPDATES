@@ -15,6 +15,9 @@ export interface HeroSlide {
   image: string;
   alt: string;
   position: number;
+  focalX?: number;
+  focalY?: number;
+  scale?: number;
 }
 
 export interface AboutContent {

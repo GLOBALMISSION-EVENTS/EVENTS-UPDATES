@@ -529,6 +529,82 @@ const EventsTab = ({
   )
 }
 
+interface ImagePosPickerProps {
+  src: string
+  focalX: number
+  focalY: number
+  scale: number
+  onFocalChange: (x: number, y: number) => void
+  onScaleChange: (s: number) => void
+}
+
+const ImagePosPicker = ({ src, focalX, focalY, scale, onFocalChange, onScaleChange }: ImagePosPickerProps) => {
+  const containerRef = useRef<HTMLDivElement>(null)
+
+  const setFocalFromEvent = (clientX: number, clientY: number) => {
+    const rect = containerRef.current?.getBoundingClientRect()
+    if (!rect) return
+    const x = ((clientX - rect.left) / rect.width) * 100
+    const y = ((clientY - rect.top) / rect.height) * 100
+    onFocalChange(Math.round(Math.max(0, Math.min(100, x))), Math.round(Math.max(0, Math.min(100, y))))
+  }
+
+  if (!src) return null
+
+  return (
+    <div className="space-y-3">
+      <p className="block text-sm font-semibold text-text-dark">Image Position</p>
+      <div
+        ref={containerRef}
+        role="button"
+        tabIndex={0}
+        className="relative w-full h-56 rounded-lg overflow-hidden bg-gray-100 cursor-crosshair select-none"
+        onClick={(e) => setFocalFromEvent(e.clientX, e.clientY)}
+        onKeyDown={(e) => {
+          if (e.key === 'Enter' || e.key === ' ') {
+            const rect = e.currentTarget.getBoundingClientRect()
+            setFocalFromEvent(rect.left + rect.width / 2, rect.top + rect.height / 2)
+          }
+        }}
+      >
+        <img
+          src={src}
+          alt="Position preview"
+          className="w-full h-full pointer-events-none"
+          style={{
+            objectFit: 'cover',
+            objectPosition: `${focalX}% ${focalY}%`,
+            transform: `scale(${scale})`,
+            transformOrigin: `${focalX}% ${focalY}%`,
+          }}
+          onError={(e) => { (e.target as HTMLImageElement).style.display = 'none' }}
+        />
+        <div
+          className="absolute w-5 h-5 -translate-x-1/2 -translate-y-1/2 pointer-events-none"
+          style={{ left: `${focalX}%`, top: `${focalY}%` }}
+        >
+          <div className="w-full h-full border-2 border-white rounded-full shadow-lg" />
+          <div className="absolute top-1/2 left-0 right-0 h-px bg-white/70" />
+          <div className="absolute left-1/2 top-0 bottom-0 w-px bg-white/70" />
+        </div>
+      </div>
+      <div className="flex items-center gap-3">
+        <span className="text-xs text-text-light w-16">Zoom: {scale.toFixed(1)}x</span>
+        <input
+          type="range"
+          min="1"
+          max="3"
+          step="0.1"
+          value={scale}
+          onChange={(e) => onScaleChange(parseFloat(e.target.value))}
+          className="flex-1 h-2 rounded-lg appearance-none cursor-pointer accent-primary bg-gray-200"
+        />
+      </div>
+      <p className="text-xs text-text-light">Click on the image to set the focal point. Drag the slider to zoom.</p>
+    </div>
+  )
+}
+
 interface HeroTabProps {
   slides: HeroSlide[]
   onAddSlide: (slide: Omit<HeroSlide, 'id'>) => void
@@ -546,7 +622,7 @@ const HeroTab = ({
 }: HeroTabProps) => {
   const [isModalOpen, setIsModalOpen] = useState(false)
   const [editingSlide, setEditingSlide] = useState<HeroSlide | null>(null)
-  const [formData, setFormData] = useState({ image: '', alt: '', position: 1 })
+  const [formData, setFormData] = useState({ image: '', alt: '', position: 1, focalX: 50, focalY: 50, scale: 1 })
   const [deleteConfirmId, setDeleteConfirmId] = useState<number | null>(null)
   const gridRef = useRef<HTMLDivElement>(null)
 
@@ -569,10 +645,17 @@ const HeroTab = ({
   const handleOpenModal = (slide?: HeroSlide) => {
     if (slide) {
       setEditingSlide(slide)
-      setFormData({ image: slide.image, alt: slide.alt, position: slide.position })
+      setFormData({
+        image: slide.image,
+        alt: slide.alt,
+        position: slide.position,
+        focalX: slide.focalX ?? 50,
+        focalY: slide.focalY ?? 50,
+        scale: slide.scale ?? 1,
+      })
     } else {
       setEditingSlide(null)
-      setFormData({ image: '', alt: '', position: slides.length + 1 })
+      setFormData({ image: '', alt: '', position: slides.length + 1, focalX: 50, focalY: 50, scale: 1 })
     }
     setIsModalOpen(true)
   }
@@ -587,7 +670,7 @@ const HeroTab = ({
     }
     setIsModalOpen(false)
     setEditingSlide(null)
-    setFormData({ image: '', alt: '', position: 1 })
+    setFormData({ image: '', alt: '', position: 1, focalX: 50, focalY: 50, scale: 1 })
   }
 
   return (
@@ -639,6 +722,9 @@ const HeroTab = ({
                 src={slide.image}
                 alt={slide.alt}
                 className="w-full h-full object-cover"
+                style={{
+                  objectPosition: `${slide.focalX ?? 50}% ${slide.focalY ?? 50}%`,
+                }}
                 onError={(e) => { (e.target as HTMLImageElement).style.display = 'none' }}
               />
             </div>
@@ -691,6 +777,14 @@ const HeroTab = ({
               required
             />
           </div>
+          <ImagePosPicker
+            src={formData.image}
+            focalX={formData.focalX}
+            focalY={formData.focalY}
+            scale={formData.scale}
+            onFocalChange={(x, y) => setFormData((prev) => ({ ...prev, focalX: x, focalY: y }))}
+            onScaleChange={(s) => setFormData((prev) => ({ ...prev, scale: s }))}
+          />
           <div className="flex gap-4 pt-4">
             <Button type="submit" className="flex-1">
               <Save className="w-5 h-5 mr-2" />

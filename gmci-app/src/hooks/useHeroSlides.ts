@@ -3,11 +3,11 @@ import { supabase } from '@/lib/supabase'
 import type { HeroSlide } from '@/types'
 
 const DEFAULT_SLIDES: Omit<HeroSlide, 'id'>[] = [
-  { image: '/images/hero images/global.jpg', alt: 'Global Mission', position: 1 },
-  { image: '/images/hero images/global 2.jpg', alt: 'Worship Service', position: 2 },
-  { image: '/images/hero images/global4.webp', alt: 'Humanitarian Work', position: 3 },
-  { image: '/images/hero images/global.webp', alt: 'Community Outreach', position: 4 },
-  { image: '/images/hero images/global5.webp', alt: 'Prayer Gathering', position: 5 },
+  { image: '/images/hero images/global.jpg', alt: 'Global Mission', position: 1, focalX: 50, focalY: 50, scale: 1 },
+  { image: '/images/hero images/global 2.jpg', alt: 'Worship Service', position: 2, focalX: 50, focalY: 50, scale: 1 },
+  { image: '/images/hero images/global4.webp', alt: 'Humanitarian Work', position: 3, focalX: 50, focalY: 50, scale: 1 },
+  { image: '/images/hero images/global.webp', alt: 'Community Outreach', position: 4, focalX: 50, focalY: 50, scale: 1 },
+  { image: '/images/hero images/global5.webp', alt: 'Prayer Gathering', position: 5, focalX: 50, focalY: 50, scale: 1 },
 ]
 
 export const useHeroSlides = () => {

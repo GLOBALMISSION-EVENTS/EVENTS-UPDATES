@@ -13,6 +13,9 @@ CREATE TABLE IF NOT EXISTS hero_slides (
     image TEXT NOT NULL,
     alt TEXT NOT NULL DEFAULT '',
     position INTEGER DEFAULT 0,
+    focal_x REAL DEFAULT 50,
+    focal_y REAL DEFAULT 50,
+    scale REAL DEFAULT 1.0,
     created_at TIMESTAMPTZ DEFAULT NOW()
 );
 

@@ -134,8 +134,12 @@ export const HeroCarousel = () => {
   const parallaxBgRef = useRef<HTMLDivElement>(null)
   const parallaxContentRef = useRef<HTMLDivElement>(null)
   const imgRef = useRef<HTMLImageElement>(null)
+  const wrapperRef = useRef<HTMLDivElement>(null)
 
   const heroImage = '/images/istockphoto-1473132437-612x612.jpg'
+  const focalX = 50
+  const focalY = 50
+  const scale = 1
 
   useEffect(() => {
     const phraseInterval = setInterval(() => {
@@ -198,22 +202,31 @@ export const HeroCarousel = () => {
     >
       <div
         ref={parallaxBgRef}
-        className="absolute inset-0 bg-cover bg-center will-change-transform"
+        className="absolute inset-0 bg-cover will-change-transform"
         style={{
           backgroundImage: `url(${getImageUrl(heroImage)})`,
+          backgroundPosition: `${focalX}% ${focalY}%`,
+          backgroundSize: `${scale * 100}%`,
           transform: 'translateY(0px)',
         }}
       />
 
-      <img
-        ref={imgRef}
-        src={getImageUrl(heroImage)}
-        alt="Global Mission For Christ International"
-        className="absolute inset-0 w-full h-full object-cover will-change-transform"
-        width="1920"
-        height="1080"
-        loading="eager"
-      />
+      <div ref={wrapperRef} className="absolute inset-0 overflow-hidden">
+        <img
+          ref={imgRef}
+          src={getImageUrl(heroImage)}
+          alt="Global Mission For Christ International"
+          className="absolute inset-0 w-full h-full object-cover will-change-transform"
+          style={{
+            objectPosition: `${focalX}% ${focalY}%`,
+            transform: `scale(${scale})`,
+            transformOrigin: `${focalX}% ${focalY}%`,
+          }}
+          width="1920"
+          height="1080"
+          loading="eager"
+        />
+      </div>
 
       <div className="absolute inset-0 bg-gradient-to-b from-dark/80 via-dark/50 to-dark/90 z-10" />
       <div className="absolute inset-0 bg-gradient-to-r from-primary/20 via-transparent to-secondary/10 z-10" />
